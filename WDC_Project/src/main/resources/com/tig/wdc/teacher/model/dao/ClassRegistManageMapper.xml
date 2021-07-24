@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.teacher.model.dao.ClassRegistManageMapper">
+    <insert id="insertClassInfo" parameterType="ClassDTO">
+        INSERT 
+          INTO CLASS
+        VALUES
+             (
+               SEQ_CLS_NO.NEXTVAL
+             , #{ title }
+             , #{ address }
+             , #{ intro }
+             , #{ cExpl }
+             , #{ time }
+             , #{ startDate }
+             , #{ endDate }
+             , #{ price }
+             , #{ addInfo }
+             , #{ addSup, jdbcType=VARCHAR }
+             , #{ dicsionStatus }
+             , #{ clsType }
+             , SYSDATE
+             , #{ status }
+             , #{ teNo }
+             , #{ categoryNo }
+             , #{ simpleIntro }
+             )
+    </insert>
+    <insert id="insertTitlePicture" parameterType="attachment">
+        <selectKey keyProperty="classNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_CLS_NO.CURRVAL
+              FROM DUAL
+        </selectKey>
+        INSERT 
+          INTO ATTACHMENT
+        VALUES 
+             (
+               SEQ_ATTACH_NO.NEXTVAL
+             , #{ originName }
+             , #{ saveName }
+             , #{ savePath }
+             , #{ type }
+             , #{ thumbnailPath }
+             , #{ attachStatus }
+             , #{ classNo }
+             )
+    </insert>
+    <insert id="insertCompletePiece" parameterType="completePiece">
+        <selectKey keyProperty="classNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_CLS_NO.CURRVAL
+              FROM DUAL
+        </selectKey>     
+        INSERT 
+          INTO CLASS_PIECE
+        VALUES 
+             (
+               SEQ_PIECE_NO.NEXTVAL
+             , #{ pieceTitle }
+             , #{ piecePicture }
+             , #{ classNo }
+             )
+    </insert>
+    <insert id="insertCurriculum" parameterType="curriculum">
+        <selectKey keyProperty="clsNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_CLS_NO.CURRVAL
+              FROM DUAL
+        </selectKey>
+        INSERT
+          INTO CURRICULUM
+        VALUES
+             (
+               SEQ_CRCLM_NO.NEXTVAL
+             , #{ curriStep } 
+             , #{ curriTitle }
+             , #{ curriContent }
+             , #{ clsNo }
+             ) 
+    </insert>
+    <insert id="insertSchedule" parameterType="schedule">
+        <selectKey keyProperty="clsNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_CLS_NO.CURRVAL
+              FROM DUAL
+        </selectKey>
+        INSERT
+          INTO SCHEDULE
+        VALUES 
+             (
+               SEQ_SCHEDULE_NO.NEXTVAL
+             , #{ scheduleType }
+             <choose>
+               <when test='scheduleType == "R"'>
+             , null  
+               </when>
+               <otherwise>
+             , #{ inputDate }
+               </otherwise>
+             </choose>
+             , #{ scheduleStart }
+             , #{ inputMin }
+             , #{ inputMax }
+             , #{ clsNo }
+             , #{ scheduleCount }
+             )
+    </insert>
+    <resultMap type="classScheduleInfo" id="scheduleInfo">
+        <id column="SCHEDULE_NO" property="scheduleNo"/>
+        <result column="MAX_PEOPLE" property="maxPeople"/>
+        <result column="SCHEDULE_COUNT" property="scheduleCount"/>
+        <result column="신청인원" property="applyCount"/>
+        <result column="시작일" property="start"/>
+        <result column="CLS_END_D" property="end"/>
+        <result column="CLS_TITLE" property="classTitle"/>
+        <result column="시작시간" property="startTime"/>
+    </resultMap>
+<!--     <select id="selectRegularScheduleinfo" parameterType="_int" resultMap="scheduleInfo">
+        SELECT 
+               A.SCHEDULE_NO
+             , A.MAX_PEOPLE  
+             , A.SCHEDULE_COUNT
+             , SUM(B.CLS_PPL) 신청인원
+             , C.CLS_START_D 시작일
+             , C.CLS_END_D
+             , C.CLS_TITLE
+          FROM SCHEDULE A
+          JOIN CLASS_APPLY B ON (A.SCHEDULE_NO = B.SCHEDULE_NO)
+          JOIN CLASS C ON (A.CLS_NO = C.CLS_NO)
+          JOIN PAYMENT D ON (B.CLS_APL_NO = D.CLS_APL_NO)
+        WHERE C.CLS_NO = #{clsNo}
+          AND D.PAY_STATUS = '완료'
+         GROUP BY A.SCHEDULE_NO,A.MAX_PEOPLE,A.SCHEDULE_COUNT,C.CLS_START_D,C.CLS_END_D,C.CLS_TITLE   
+    </select> -->
+    <select id="selectRegularScheduleinfo" parameterType="_int" resultMap="scheduleInfo">
+        SELECT
+               A.SCHEDULE_NO
+             , A.MAX_PEOPLE  
+             , A.SCHEDULE_COUNT  
+             , B.CLS_START_D 시작일
+             , B.CLS_END_D
+             , B.CLS_TITLE
+          FROM SCHEDULE A
+          JOIN CLASS B ON (A.CLS_NO = B.CLS_NO)
+         WHERE A.CLS_NO = #{ clsNo }   
+    </select>
+    <resultMap type="classApplyInfo" id="applyInfo">
+        <id column="CLS_APL_NO" property="aplNo"/>
+        <result column="USER_NO" property="userNo"/>
+        <result column="ATT_STATUS" property="attStatus"/>
+        <result column="SCHEDULE_NO" property="scheduleNo"/>
+        <result column="USER_NAME" property="userName"/>
+        <result column="USER_PHONE" property="userPhone"/>
+        <result column="CLS_PPL" property="ppl"/>
+    </resultMap>
+    <select id="selectApplyUserInfo" resultMap="applyInfo" parameterType="string">
+        SELECT
+               A.CLS_APL_NO
+             , A.ATT_STATUS
+             , A.SCHEDULE_NO
+             , A.USER_NO 
+             , B.USER_NAME
+             , B.USER_PHONE
+             , A.CLS_PPL
+          FROM CLASS_APPLY A
+          JOIN USER_INFO B ON (A.USER_NO = B.USER_NO)
+          JOIN PAYMENT C ON (A.CLS_APL_NO = C.CLS_APL_NO)
+         WHERE A.SCHEDULE_NO = #{ scheduleNo }
+           AND C.PAY_STATUS = '완료'
+    </select>
+    <select id="selectOneDayScheduleList" resultMap="scheduleInfo" parameterType="ClassDTO">
+        SELECT 
+               A.SCHEDULE_NO
+             , A.시작일 
+             , A.CLS_TITLE
+             , A.MAX_PEOPLE
+             , A.시작시간
+          FROM (SELECT ROWNUM RNUM
+                     , B.SCHEDULE_NO
+                     , B.시작일
+                     , B.CLS_TITLE
+                     , B.MAX_PEOPLE
+                     , B.시작시간
+                  FROM (SELECT C.SCHEDULE_NO
+                             , C.SCHEDULE_DATE 시작일
+                             , C.MAX_PEOPLE
+                             , C.SCHEDULE_START 시작시간
+                             , D.CLS_TITLE
+                          FROM SCHEDULE  C
+                          JOIN CLASS D ON (C.CLS_NO = D.CLS_NO)
+                         WHERE C.CLS_NO = #{ clsNo }
+                         ORDER BY C.SCHEDULE_DATE
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ pageInfo.startRow } AND #{ pageInfo.endRow }     
+    </select>
+    <update id="modifyOndeDayAttendanceStatus" parameterType="hashmap">
+        UPDATE CLASS_APPLY
+        <if test='status == "reset"'>
+           SET ATT_STATUS = 'N'
+         WHERE CLS_APL_NO IN
+         <foreach collection="allApplyNo" item="all" open="(" close=")" separator=",">
+             #{ all }
+         </foreach>
+        </if>
+        <if test='status == "update"'>
+           SET ATT_STATUS = 'Y'
+         WHERE CLS_APL_NO IN 
+         <foreach collection="checkedApplyNo" item="checked" open="(" close=")" separator=",">
+             #{ checked }
+         </foreach>
+        </if>
+    </update>
+    <insert id="insertRegularClassAttendance" parameterType="hashmap">
+        INSERT 
+          INTO REGULAR_CLASS
+        VALUES
+             (
+               SEQ_REG_MANAGE_NO.NEXTVAL
+             , #{ attendanceDate }
+             , #{ userNo }
+             , #{ applyNo }
+             , #{ classStep }
+             , #{ scheduleNo }
+             )
+    </insert>
+    <resultMap type="regularAttend" id="regularAttendInfo">
+        <id column="REG_MANAGE_NO" property="regManageNo"/>
+        <result column="CLASS_DATE" property="classDate"/>
+        <result column="ATTENDER_NO" property="attendanceUser"/>
+        <result column="CLS_APL_NO" property="attendanceApply"/>
+        <result column="CLASS_STEP" property="classStep"/>
+        <result column="SCHEDULE_NO" property="scheduleNo"/>
+    </resultMap>
+    <select id="selectExistingInfo" resultMap="regularAttendInfo" parameterType="_int">
+        SELECT 
+               *
+          FROM REGULAR_CLASS
+         WHERE SCHEDULE_NO = #{ scheduleNo } 
+         ORDER BY CLASS_STEP 
+    </select>
+    <select id="selectOnedayApplyCount" resultMap="scheduleInfo" parameterType="java.util.List">
+        SELECT
+               A.SCHEDULE_NO
+             , SUM(A.CLS_PPL) 신청인원
+          FROM CLASS_APPLY A
+          JOIN PAYMENT B ON (A.CLS_APL_NO = B.CLS_APL_NO)
+         WHERE PAY_STATUS = '완료'
+           AND A.SCHEDULE_NO IN 
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="," >
+             #{ item.scheduleNo }
+        </foreach>
+         GROUP BY A.SCHEDULE_NO  
+    </select>
+    <select id="selectRegularApplyCount" resultMap="scheduleInfo">
+        SELECT
+               A.SCHEDULE_NO
+             , SUM(A.CLS_PPL) 신청인원
+          FROM CLASS_APPLY A
+          JOIN PAYMENT B ON (A.CLS_APL_NO = B.CLS_APL_NO)
+         WHERE PAY_STATUS = '완료'
+           AND A.SCHEDULE_NO = #{ scheduleNo }
+         GROUP BY A.SCHEDULE_NO   
+    </select>
+    <update id="updateRegularApplyStatus" parameterType="map">
+        UPDATE CLASS_APPLY
+           SET ATT_STATUS = 'Y'
+         WHERE CLS_APL_NO IN
+         <foreach collection="array" item="item" open="(" close=")" separator=",">
+             #{ item }
+         </foreach>
+    </update>
+    <select id="selectReviewCount" resultType="_int" parameterType="string">
+        SELECT
+              COUNT(A.REVIEW_NO)
+         FROM REVIEW A
+         JOIN CLASS_APPLY C ON (A.CLS_APL_NO = C.CLS_APL_NO)
+         JOIN SCHEDULE D ON (C.SCHEDULE_NO = D.SCHEDULE_NO)
+        WHERE D.CLS_NO = #{ clsNo }
+    </select>
+    
+    <resultMap type="UserReviewDTO" id="ReviewResult">
+        <id column="REVIEW_NO" property="reviewNo"/>
+        <result column="REVIEW_CONTENT" property="reviewContent"/>
+        <result column="REVIEW_PIC" property="reviewPic"/>
+        <result column="REVIEW_SCORE" property="reviewScore"/>
+        <result column="REVIEW_ENROLLDATE" property="reviewEnrollDate"/>
+        <result column="CLS_APL_NO" property="aplNo"/>
+        <result column="USER_NAME" property="userName"/>
+        <!-- 리뷰답변 DTO association 함 -->
+        <association property="answer" javaType="ReviewAnswerDTO">
+        	<id column="RE_ANS_NO" property="ansNo"/>
+	        <result column="RE_ANS_D" property="ansDate"/>
+	        <result column="RE_ANS_CONTENT" property="ansContent"/>
+	        <result column="REVIEW_NO" property="reviewNo"/>
+	        <result column="TE_NO" property="teNo"/>
+	        <result column="TE_NAME" property="teName"/>
+	        <result column="TE_PIC" property="tePic"/>
+        </association>
+    </resultMap>    
+    <select id="selectReviewList" resultMap="ReviewResult" parameterType="hashmap">
+        SELECT 
+               A.REVIEW_NO
+             , A.REVIEW_CONTENT
+             , A.REVIEW_PIC
+             , A.REVIEW_SCORE
+             , A.REVIEW_ENROLLDATE
+             , A.RE_ANS_D
+             , A.RE_ANS_CONTENT
+             , A.TE_NO
+             , A.TE_PIC
+             , A.USER_NAME
+          FROM (SELECT ROWNUM RNUM
+                     , B.REVIEW_NO
+                     , B.REVIEW_CONTENT
+                     , B.REVIEW_PIC
+                     , B.REVIEW_SCORE
+                     , B.REVIEW_ENROLLDATE
+                     , B.RE_ANS_D
+                     , B.RE_ANS_CONTENT
+                     , B.TE_NO
+                     , B.TE_PIC
+                     , B.USER_NAME
+                  FROM (SELECT C.REVIEW_NO
+                             , C.REVIEW_CONTENT
+                             , C.REVIEW_PIC
+                             , C.REVIEW_SCORE
+                             , C.REVIEW_ENROLLDATE
+                             , D.RE_ANS_D
+                             , D.RE_ANS_CONTENT
+                             , D.TE_NO
+                             , H.TE_PIC
+                             , I.USER_NAME
+                          FROM REVIEW C
+                          LEFT JOIN REVIEW_ANSWER D ON (C.REVIEW_NO = D.REVIEW_NO)
+                          JOIN CLASS_APPLY E ON (C.CLS_APL_NO = E.CLS_APL_NO)
+                          JOIN SCHEDULE F ON (E.SCHEDULE_NO = F.SCHEDULE_NO)
+                          JOIN CLASS G ON (F.CLS_NO = G.CLS_NO)
+                          JOIN TEACHER_INFO H ON (G.TE_NO = H.TE_NO)
+                          JOIN USER_INFO I ON(E.USER_NO = I.USER_NO)
+                         WHERE G.CLS_NO = #{ clsNo }
+                         ORDER BY C.REVIEW_NO DESC
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ pageInfo.startRow } AND #{ pageInfo.endRow }      
+    </select>
+    <select id="selectReviewAvgScore" parameterType="string" resultType="_double">
+        SELECT
+               NVL(ROUND(AVG(A.REVIEW_SCORE),1),0)
+          FROM REVIEW A
+          JOIN CLASS_APPLY C ON (A.CLS_APL_NO = C.CLS_APL_NO)
+          JOIN SCHEDULE D ON (C.SCHEDULE_NO = D.SCHEDULE_NO)
+         WHERE D.CLS_NO = #{ clsNo }    
+    </select>
+    <insert id="insertReviewAnswer" parameterType="ReviewAnswerDTO">
+        INSERT
+          INTO REVIEW_ANSWER
+        VALUES 
+             (
+               SEQ_RE_ANS_NO.NEXTVAL
+             , SYSDATE
+             , #{ ansContent }
+             , #{ reviewNo }
+             , #{ teNo }
+             )  
+    
+    </insert>
+    <select id="selectRejectReason" resultType="string" parameterType="_int">
+        SELECT
+               REJECT_REASON 
+          FROM DISICION_HISTORY
+         WHERE CLS_NO = #{ clsNo }    
+    </select>
+    <select id="selectCheeringCount" resultType="_int" parameterType="_int">
+        SELECT 
+               COUNT(CLS_NO) 
+          FROM CHEERING_HISTORY 
+         WHERE CLS_NO = #{ clsNo }
+    </select>
+</mapper>

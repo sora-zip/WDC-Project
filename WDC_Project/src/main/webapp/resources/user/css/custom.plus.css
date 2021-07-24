@@ -1,0 +1,39 @@
+@charset "UTF-8";
+.productNoneOpacity .badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 999;
+}
+.productNoneOpacity:hover img {
+  -webkit-filter: grayscale(40%);
+  filter: grayscale(40%);
+  transition: all 0.3s;
+}
+
+.refunderInfo{
+    border-radius: 5px;
+    text-align: center;
+    width: 230px !important
+}
+
+.refundBackground{
+    padding-top: 10px;
+    height: 15px !important; 
+    width: 300px;
+    margin-top: -5px;
+    border-radius: 5px;
+}
+
+.btn-dark:Focus {
+  text-decoration: none;
+  backgroun-color: #fef0ae !important;
+  color: black !important;
+  border-color: #fef0ae !important;
+}
+
+.btn-dark:focus, .btn-dark.focus {
+  background-color: #fef0ae !important;
+  border: none !important;
+  color: black !important;
+}

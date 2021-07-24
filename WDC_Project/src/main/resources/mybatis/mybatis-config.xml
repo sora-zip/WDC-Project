@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ <configuration>
+ 	<settings>
+ 		<setting name="jdbcTypeForNull" value="NULL"/>
+ 	</settings>
+ 	<typeAliases>
+ 	
+ 		<!-- admin -->
+ 		<typeAlias alias="TotalDTO" type="com.tig.wdc.admin.model.dto.TotalDTO"/>
+ 		<typeAlias alias="ClassDTO" type="com.tig.wdc.admin.model.dto.ClassDTO"/>
+ 		<typeAlias alias="ReportDTO" type="com.tig.wdc.admin.model.dto.ReportDTO"/>
+ 		<typeAlias alias="QuestionDTO" type="com.tig.wdc.admin.model.dto.QuestionDTO"/>
+ 		<typeAlias alias="CouponDTO" type="com.tig.wdc.admin.model.dto.CouponDTO"/> 		
+ 		<typeAlias alias="NoticeDTO" type="com.tig.wdc.admin.model.dto.NoticeDTO"/> 		
+ 		<typeAlias alias="CalculateDTO" type="com.tig.wdc.admin.model.dto.CalculateDTO"/>	
+ 		<typeAlias alias="TeacherInfoDTO" type="com.tig.wdc.model.dto.TeacherInfoDTO"/>
+ 		<typeAlias alias="notice" type="com.tig.wdc.model.dto.NoticeDTO"/>
+ 		<typeAlias alias="paging" type="com.tig.wdc.model.dto.PageInfoDTO"/>
+ 		<typeAlias alias="StudentDTO" type="com.tig.wdc.admin.model.dto.StudentDTO"/>
+ 		<typeAlias alias="TeacherDTO" type="com.tig.wdc.admin.model.dto.TeacherDTO"/>
+ 		<typeAlias alias="reportDetailDTO" type="com.tig.wdc.admin.model.dto.ReportDetailDTO"/>
+ 		<typeAlias alias="blackListDTO" type="com.tig.wdc.admin.model.dto.BlackListDTO"/>
+ 		<typeAlias alias="RefundDTO" type="com.tig.wdc.admin.model.dto.RefundDTO"/>
+ 		<typeAlias alias="ClsDecisionDTO" type="com.tig.wdc.admin.model.dto.ClsDecisionDTO"/>
+ 		<typeAlias alias="CheeringClassDTO" type="com.tig.wdc.admin.model.dto.CheeringClassDTO"/>
+ 		<typeAlias alias="adminDTO" type="com.tig.wdc.admin.model.dto.AdminDTO"/>
+ 		
+ 		
+ 		<!-- user -->
+ 		<typeAlias alias="UserInfoDTO" type="com.tig.wdc.user.model.dto.UserInfoDTO"/>
+ 		<typeAlias alias="UserClassDTO" type="com.tig.wdc.user.model.dto.UserClassDTO"/>
+ 		<typeAlias alias="UserCouponDTO" type="com.tig.wdc.user.model.dto.UserCouponDTO"/>
+ 		<typeAlias alias="ClassPieceDTO" type="com.tig.wdc.user.model.dto.ClassPieceDTO"/>
+ 		<typeAlias alias="CurriculumDTO" type="com.tig.wdc.model.dto.CurriculumDTO"/>
+ 		<typeAlias alias="UserReviewDTO" type="com.tig.wdc.user.model.dto.UserReviewDTO"/>
+ 		<typeAlias alias="ReviewAnswerDTO" type="com.tig.wdc.user.model.dto.ReviewAnswerDTO"/>
+ 		<typeAlias alias="ScheduleDTO" type="com.tig.wdc.user.model.dto.ScheduleDTO"/>
+ 		<typeAlias alias="UserInquiryDTO" type="com.tig.wdc.user.model.dto.UserInquiryDTO"/>
+ 		<typeAlias alias="InquiryAnswerDTO" type="com.tig.wdc.user.model.dto.InquiryAnswerDTO"/>
+ 		<typeAlias alias="NoticeDTO" type="com.tig.wdc.admin.model.dto.NoticeDTO"/>
+ 		<typeAlias alias="PageInfoDTO" type="com.tig.wdc.model.dto.PageInfoDTO"/>
+ 		<typeAlias alias="UserReportDTO" type="com.tig.wdc.user.model.dto.UserReportDTO"/>
+ 		<typeAlias alias="PaymentDTO" type="com.tig.wdc.user.model.dto.PaymentDTO"/>
+ 		<typeAlias alias="ClassApplyDTO" type="com.tig.wdc.user.model.dto.ClassApplyDTO"/>
+ 		<typeAlias alias="UserRefundDTO" type="com.tig.wdc.user.model.dto.UserRefundDTO"/>
+ 		<typeAlias alias="UserLikeClassDTO" type="com.tig.wdc.user.model.dto.UserLikeClassDTO"/>
+ 		
+ 		
+ 		<!-- teacher  -->
+ 		<typeAlias alias="CALCULATE" type="com.tig.wdc.model.dto.BalanceDTO"/>
+ 		<typeAlias alias="attachment" type="com.tig.wdc.model.dto.AttachMentDTO"/>
+ 		<typeAlias alias="completePiece" type="com.tig.wdc.model.dto.ClassPieceDTO"/>
+ 		<typeAlias alias="curriculum" type="com.tig.wdc.model.dto.CurriculumDTO"/>
+ 		<typeAlias alias="schedule" type="com.tig.wdc.user.model.dto.ScheduleDTO"/>
+ 		<typeAlias alias="classInfo" type="com.tig.wdc.user.model.dto.ClassDTO"/>
+ 		<typeAlias alias="scheduleInfo" type="com.tig.wdc.user.model.dto.ScheduleDTO"/>
+ 		<typeAlias alias="classScheduleInfo" type="com.tig.wdc.model.dto.ClassScheduleInfoDTO"/>
+ 		<typeAlias alias="classApplyInfo" type="com.tig.wdc.user.model.dto.ClassApplyDTO"/>
+ 		<typeAlias alias="regularAttend" type="com.tig.wdc.model.dto.RegularClassAttendanceDTO"/>
+ 		
+ 	</typeAliases>
+ </configuration>

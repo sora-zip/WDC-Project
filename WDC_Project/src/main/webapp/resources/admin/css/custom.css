@@ -1,0 +1,63 @@
+/* your styles go here */
+.bg-light1{
+    background-color: #fef0ae !important;
+    border-radius: 6px !important;
+  }
+
+.bg-light{
+    border-radius: 5px !important;
+}
+
+.breadcrumb{
+    background-color: #fef0ae !important;
+}
+
+.py-2{
+    border-radius: 7px;
+}
+
+.refunderInfo{
+    border-radius: 5px;
+    text-align: center;
+    width: 200px !important
+}
+
+.refundReasonInput{
+    margin-left: 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-right: 6px;
+}
+
+.refundBackground{
+    background-color: lightgray; 
+    height: 30px; 
+    width: 300px;
+    margin-top: -5px;
+    border-radius: 5px;
+}
+
+.accordion .card-header i {
+    float: right;
+    font-size: 1.3rem;
+    font-weight: bold;
+    position: relative;
+    top: 5px;
+}
+.accordion .card-header .btn {
+    color: black;
+    font-size: 1.04rem;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    top: -2px;
+    font-weight: 500;
+}
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+}
+
+

@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.user.model.dao.UserInfoMapper">
+
+    <resultMap type="UserInfoDTO" id="UserInfoResult">
+        <id column="USER_NO" property="userNo"/>
+        <result column="USER_ID" property="userId"/>
+        <result column="USER_PWD" property="userPwd"/>
+        <result column="USER_NAME" property="userName"/>
+        <result column="USER_PHONE" property="phone"/>
+        <result column="USER_BIRTH" property="birthDate"/>
+        <result column="USER_BLOCK_YN" property="blockYn"/>
+        <result column="USER_QUIT_YN" property="quitYn"/>
+        <result column="USER_ENROLL_DATE" property="enrollDate"/>
+    </resultMap>
+    
+    <resultMap type="UserCouponDTO" id="CouponResult">
+    	<id column="CPN_NO" property="cpnNo"/>
+    	<result column="CPN_NAME" property="cpnName"/>
+        <result column="DIS_AMOUNT" property="disAmount"/>
+        <result column="DIS_CONDITION" property="disCondition"/>
+        <result column="CPN_START" property="cpnStart"/>
+        <result column="CPN_END" property="cpnEnd"/>
+        <result column="CPN_USE_YN" property="cpnUseYn"/>
+        <result column="CHEERING_NO" property="cheeringNo"/>
+        <result column="USER_NO" property="userNo"/>
+        <result column="CPN_ISSUE_DATE" property="issuedDate"/>
+        <result column="CLS_TITLE" property="couponClassName"/>
+        <result column="CLS_NO" property="clsNo"/>
+    </resultMap>
+    
+    <resultMap type="UserClassDTO" id="UserClassResult">
+        <id column="CLS_NO" property="clsNo"/>
+        <result column="CLS_TITLE" property="title"/>
+        <result column="CLS_ADDRESS" property="address"/>
+        <result column="CLS_INTRO" property="intro"/>
+        <result column="CLS_C_EXPL" property="cExpl"/>
+        <result column="CLS_TIME" property="time"/>
+        <result column="CLS_START_D" property="startDate"/>
+        <result column="CLS_END_D" property="endDate"/>
+        <result column="CLS_PRICE" property="price"/>
+        <result column="CLS_ADD_INFO" property="addInfo"/>
+        <result column="CLS_ADD_SUP" property="addSup"/>
+        <result column="CLS_DICSION_STATUS" property="dicsionStatus"/>
+        <result column="CLS_TYPE" property="clsType"/>
+        <result column="DATE_APLCT" property="dateAplct"/>
+        <result column="CLS_STATUS" property="status"/>
+        <result column="TE_NO" property="teNo"/>
+        <result column="CATEGORY_NO" property="categoryNo"/>
+        <result column="CLS_SIMPLE_INTRO" property="simpleIntro"/>
+        <result column="SAVE_PATH" property="titlePic"/>
+        <result column="D_DAY" property="dDay"/>
+        <result column="SCHEDULE_DATE" property="scheduleDate"/>
+        <result column="SCHEDULE_START" property="scheduleStart"/>
+        <result column="CLS_PPL" property="clsPplAmount"/>
+        <result column="PAY_PRICE" property="payPrice"/>
+        <result column="CLS_APL_NO" property="aplNo"/>
+        <result column="TE_NAME" property="teName"/>
+        <result column="CLS_APL_D" property="clsAplDate"/>
+        <result column="CLS_PPL" property="ppl"/>
+        <result column="PAY_STATUS" property="payStatus"/>
+        <result column="REFUND_AMOUNT" property="refundAmount"/>
+        <result column="REFUND_STATUS" property="refundStatus"/>
+        <result column="PAY_NO" property="payNo"/>
+        <result column="SCHEDULE_NO" property="scheduleNo"/>
+    </resultMap>
+    
+    <resultMap type="UserReviewDTO" id="ReviewResult">
+        <id column="REVIEW_NO" property="reviewNo"/>
+        <result column="REVIEW_SCORE" property="reviewScore"/>
+        <result column="REVIEW_CONTENT" property="reviewContent"/>
+        <result column="REVIEW_PIC" property="reviewPic"/>
+        <result column="REVIEW_ENROLLDATE" property="reviewEnrollDate"/>
+        <result column="CLS_APL_NO" property="aplNo"/>
+        <result column="USER_NAME" property="userName"/>
+    </resultMap>
+    
+    <resultMap type="UserLikeClassDTO" id="LikeClassResult">
+        <id column="LIKE_NO" property="likeNo"/>
+        <result column="CLS_NO" property="clsNo"/>
+        <result column="LIKE_STATUS" property="likeStatus"/>
+        <result column="USER_NO" property="userNo"/>
+        <result column="RNUM" property="rowNum"/>
+    </resultMap>
+
+	<select id="selectUser" parameterType="UserInfoDTO" resultMap="UserInfoResult">
+		SELECT
+	           *
+		  FROM USER_INFO A
+		 WHERE A.USER_NO = #{userNo}
+	</select>
+	
+	<select id="findfindUserInfo" parameterType="UserInfoDTO" resultMap="UserInfoResult">
+       SELECT
+              *
+         FROM USER_INFO A
+        WHERE A.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectCouponList" parameterType="UserCouponDTO" resultMap="CouponResult">
+		SELECT 
+		       *
+		  FROM COUPON A
+		  JOIN CHEERING_HISTORY H ON(A.CHEERING_NO = H.CHEERING_NO)
+		  JOIN CLASS C ON(H.CLS_NO = C.CLS_NO)
+		 WHERE A.USER_NO = #{userNo}
+		   AND CPN_USE_YN = 'N'
+		 ORDER BY CPN_NO
+	</select>
+	
+	<select id="selectScheduledClassList" parameterType="UserClassDTO" resultMap="UserClassResult">
+	    SELECT 
+		       C.*
+             , S.*
+             , A.*
+             , L.*
+             , P.*
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+		   AND C.ATT_STATUS = 'N'
+           AND TO_CHAR(S.SCHEDULE_DATE,'yy/MM/dd') != (SELECT
+                                                             TO_CHAR(SYSDATE,'yy/MM/dd')
+                                                        FROM DUAL)	
+           <![CDATA[
+		   AND (S.SCHEDULE_DATE > SYSDATE )
+		   ]]>
+		   AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '완료'
+		   AND L.CLS_TYPE = 'O'
+         UNION ALL
+        SELECT 
+	           C.*
+             , S.*
+             , A.*
+             , L.*
+             , P.*
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+		   AND C.ATT_STATUS = 'N'
+		   AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '완료'
+           AND CLS_TYPE = 'R'  
+	</select>
+
+	<select id="selectparticipatingClassList" parameterType="_int" resultMap="UserClassResult">
+        SELECT 
+               C.*
+             , S.*
+             , L.*
+             , A.*
+             , P.*
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+           AND C.ATT_STATUS = 'N'
+           AND CLS_TYPE = 'O'  
+           AND TO_CHAR(S.SCHEDULE_DATE,'yy/MM/dd') = (SELECT
+                                                             TO_CHAR(SYSDATE,'yy/MM/dd')
+                                                        FROM DUAL)
+		   AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '완료'
+         UNION ALL
+        SELECT 
+               C.*
+             , S.*
+             , L.*
+             , A.*
+             , P.*
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+           AND C.ATT_STATUS = 'Y' -- 한번이라도 출석 시 Y
+		   AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '완료'
+           AND CLS_TYPE = 'R'  
+           <![CDATA[
+           AND (L.CLS_START_D <= SYSDATE)
+           AND (L.CLS_END_D >= SYSDATE)
+           ]]>
+	</select>
+	
+	<!-- 참여 완료, 환불한 클래스 조회용  -->
+	<select id="selectComplateClassList" parameterType="PageInfoDTO" resultMap="UserClassResult">
+        SELECT
+               Z.RNUM
+             , Z.*
+             , QCSJ_C000000001200000 CLS_APL_NO
+         FROM (SELECT
+                      ROWNUM RNUM
+                    , Y.*
+                 FROM (SELECT
+                              X.*
+			             FROM (SELECT 
+			                          *
+			                     FROM CLASS_APPLY C
+			                     JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+			                     JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+			                     JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+			                     JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+			                    WHERE C.USER_NO = #{ userNo }
+			                      AND A.TYPE = 'TITLE'
+			                      AND C.ATT_STATUS = 'Y'
+			                      AND L.CLS_TYPE = 'O'
+			                      AND P.PAY_STATUS = '완료'
+			                    UNION ALL  
+                               SELECT 
+			                          *
+			                     FROM CLASS_APPLY C
+			                     JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+			                     JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+			                     JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+			                     JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+			                    WHERE C.USER_NO = #{ userNo }
+			                      AND A.TYPE = 'TITLE'
+			                      AND C.ATT_STATUS = 'Y'
+			                      AND L.CLS_STATUS = 'E'
+                                  AND L.CLS_TYPE = 'R'
+			                      AND P.PAY_STATUS = '완료'
+                            UNION ALL
+			                   SELECT 
+			                          *
+			                     FROM CLASS_APPLY C
+			                     JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+			                     JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+			                     JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+			                     JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+			                    WHERE C.USER_NO = #{ userNo }
+			                      AND A.TYPE = 'TITLE'
+			                      AND P.PAY_STATUS = '취소') X
+                 		 ORDER BY X.PAY_STATUS ASC
+                                , X.CLS_APL_D DESC)Y ) Z
+         WHERE Z.RNUM BETWEEN #{ startRow } AND #{ endRow }
+	</select>
+	
+	<select id="selectRefundClassList" parameterType="_int" resultMap="UserClassResult">
+	    SELECT 
+		       *
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{userNo}
+           AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '취소'
+	</select>
+	
+	<select id="selectScheduleDetail" parameterType="UserClassDTO" resultMap="UserClassResult">
+        SELECT 
+		       *
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+          JOIN TEACHER_INFO T ON(L.TE_NO = T.TE_NO)
+          <if test='payStatus == "취소"'>
+          JOIN PAYMENT_CANCEL X ON(P.PAY_NO = X.PAY_NO)
+          </if>
+         WHERE C.USER_NO = #{ userNo }
+           AND C.CLS_APL_NO = #{ aplNo }
+		   AND A.TYPE = 'TITLE'
+	</select>
+	
+    <select id="selectReviewYn" parameterType="_int" resultType="_int">
+	    SELECT
+		       COUNT(REVIEW_NO)
+		  FROM REVIEW
+		 WHERE CLS_APL_NO = #{ aplNo }
+    </select>
+    
+    <insert id="insertReview" parameterType="UserReviewDTO">
+    	INSERT
+	      INTO REVIEW
+		VALUES
+		(
+		  SEQ_REVIEW_NO.NEXTVAL
+		, #{ reviewContent }
+		, #{ reviewPic }
+		, #{ reviewScore }
+		, SYSDATE
+		, #{ aplNo }
+		)
+    </insert>
+    
+    <select id="selectAllUserCouponList" resultMap="CouponResult">
+ 		SELECT 
+		       *
+		  FROM COUPON A
+         WHERE A.USER_NO = 0 
+    </select>
+
+	<select id="selectUseAllUserCoupon" parameterType="UserCouponDTO" resultType="_int">
+	    SELECT 
+               COUNT(*)
+          FROM ALL_USER_COUPON
+         WHERE USER_NO = #{ userNo }
+           AND CPN_NO = #{ cpnNo }
+	</select>
+	
+	<select id="selectExistingInfo" parameterType="map" resultMap="UserInfoResult">
+	    SELECT
+	           A.USER_NO
+	         , A.USER_ID
+	         , A.USER_PWD
+	      FROM USER_INFO A
+	      WHERE A.USER_PHONE = #{ phoneNumber } 
+	      <if test='type == "id"'>
+	        AND A.USER_NAME = #{ name }
+	      </if>
+	      <if test='type == "pwd"'>
+	        AND A.USER_ID = #{ id  }
+	      </if>
+	</select>
+	
+	<select id="selectCheckDoubleId" parameterType="string" resultType="string">
+        SELECT 
+               A.USER_ID 
+          FROM USER_INFO A
+         WHERE A.USER_ID = #{ checkId }
+	</select>
+	
+	<insert id="registUser">
+	   INSERT
+	     INTO USER_INFO
+	   VALUES
+	   (
+	     #{ userId }
+	   , #{ userPwd }
+	   , #{ userName }
+	   , #{ phone }
+	   , #{ birthDate }
+	   , SEQ_USER_NO.NEXTVAL
+	   , 'N'
+	   , 'N'
+	   , SYSDATE
+	   , 'U'
+	   )	
+	</insert>
+	
+	<select id="selectCompleteClssCount" parameterType="_int" resultType="_int">
+        SELECT 
+		       COUNT(*)
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+           AND A.TYPE = 'TITLE'
+           AND C.ATT_STATUS = 'Y'
+          <![CDATA[           
+           AND (S.SCHEDULE_DATE <= SYSDATE
+            OR L.CLS_END_D <= SYSDATE)
+            ]]>
+           AND P.PAY_STATUS = '완료'
+	</select>
+
+	<select id="selectRefundClassCount" parameterType="_int" resultType="_int">
+	    SELECT 
+		       COUNT(*)
+		  FROM CLASS_APPLY C
+		  JOIN SCHEDULE S ON(C.SCHEDULE_NO = S.SCHEDULE_NO)
+		  JOIN CLASS L ON(S.CLS_NO = L.CLS_NO)
+		  JOIN ATTACHMENT A ON(L.CLS_NO = A.CLS_NO)
+          JOIN PAYMENT P ON(P.CLS_APL_NO = C.CLS_APL_NO)
+		 WHERE C.USER_NO = #{ userNo }
+           AND A.TYPE = 'TITLE'
+           AND P.PAY_STATUS = '취소'
+	</select>
+		
+	<select id="selectLikeStatus" parameterType="UserLikeClassDTO" resultType="_int">
+		SELECT
+		       COUNT(LIKE_STATUS)
+		  FROM LIKE_HISTORY
+		 WHERE USER_NO = #{ userNo }
+		   AND CLS_NO = #{ clsNo }
+		   AND LIKE_STATUS = 'Y'
+	</select>
+	
+	<select id="selectLikeHistory" parameterType="UserLikeClassDTO" resultType="_int">
+		SELECT
+		       COUNT(LIKE_STATUS)
+		  FROM LIKE_HISTORY
+		 WHERE USER_NO = #{ userNo }
+		   AND CLS_NO = #{ clsNo }
+		   AND LIKE_STATUS = 'N'
+	</select>
+	
+	<insert id="insertLike" parameterType="UserLikeClassDTO">
+		INSERT INTO LIKE_HISTORY
+		VALUES
+		(
+		  SEQ_LIKE_NO.NEXTVAL
+		, #{ clsNo }
+		, 'Y'
+		, #{ userNo }
+		)
+	</insert>
+	
+	<update id="updateLikeYn" parameterType="UserLikeClassDTO">
+		UPDATE LIKE_HISTORY 
+		<if test="likeStatus == 'Y'">
+		   SET LIKE_STATUS = 'N',
+		       LIKE_NO = SEQ_LIKE_NO.NEXTVAL
+		</if>
+		<if test="likeStatus == 'N'">
+		   SET LIKE_STATUS = 'Y',
+		       LIKE_NO = SEQ_LIKE_NO.NEXTVAL
+		</if>
+		 WHERE USER_NO = #{ userNo }
+		   AND CLS_NO = #{ clsNo }
+	</update>
+	
+	<select id="selectPhone" parameterType="UserInfoDTO" resultType="_int">
+		SELECT
+		       COUNT(USER_NO)
+		  FROM USER_INFO
+		 WHERE USER_PHONE = #{ phone }
+	</select>
+	
+	<select id="selectPwd" parameterType="UserInfoDTO" resultType="String">
+		SELECT
+		       USER_PWD
+		  FROM USER_INFO
+		 WHERE USER_NO = #{ userNo }
+	</select>
+	
+	<update id="updatePhone" parameterType="UserInfoDTO">
+		UPDATE USER_INFO
+		   SET USER_PHONE = #{ phone }
+		 WHERE USER_NO = #{ userNo }
+	</update>
+	
+	<update id="updatePwd" parameterType="UserInfoDTO">
+		UPDATE USER_INFO
+		   SET USER_PWD = #{ userPwd }
+		 WHERE USER_NO = #{ userNo }
+	</update>
+	
+	<select id="selectlikeClassCount" parameterType="_int" resultType="_int">
+		SELECT 
+		       COUNT(USER_NO)
+		  FROM LIKE_HISTORY
+		 WHERE USER_NO = #{ userNo }
+	</select>
+</mapper>

@@ -1,0 +1,24 @@
+/* your styles go here */
+.nowStep{
+
+    text-align: center; 
+
+    background-color: #fef0ae; 
+
+    font-weight: bolder; 
+
+    border-bottom: 1px solid #fef0ae;
+
+  }
+
+  .step{
+
+    text-align: center;
+
+    opacity: 50%;
+
+    text-align: center;
+
+  }
+
+

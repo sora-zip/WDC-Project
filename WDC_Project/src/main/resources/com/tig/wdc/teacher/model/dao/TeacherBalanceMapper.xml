@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.teacher.model.dao.TeacherBalanceMapper">
+	
+	<resultMap type="CALCULATE" id="calculateInfo">
+		<id column="CALC_NO" property="calNo"/>
+		<result column="CALC_MONTH" property="calcMonth"/>
+		<result column="CALC_AMOUNT" property="calcAmount"/>
+		<result column="USE_FEE" property="useFee"/>
+		<result column="TAX" property="tax"/>
+		<result column="CARD_FEE" property="cardFee"/>
+		<result column="TE_NO" property="teNo"/>
+		<result column="CALC_AMOUNT" property="calcAmount"/>
+	</resultMap>
+	
+	<select id="selectBalanceCount" resultType="_int">
+		SELECT COUNT(A.CALC_NO)
+		  FROM CALCULATE A
+	</select>
+
+	<select id="selectBalanceList" parameterType="hashmap" resultMap="calculateInfo">
+		SELECT C.ROWNUM
+			   C.CALC_NO
+		     , C.CALC_MONTH
+		     , C.CALC_AMOUNT
+		  FROM (SELECT ROWNUM
+			           B.CALC_NO
+		     		 , B.CALC_MONTH
+		             , B.CALC_AMOUNT
+		          FROM ( SELECT A.CALC_NO
+		     		          , A.CALC_MONTH
+		     		          , A.CALC_AMOUNT
+		  		           FROM CALCULATE A
+		 		          WHERE A.TE_NO = #{ teacherNo }
+		 		          ORDER BY A.CALC_MONTH DESC
+		 	           ) B
+		 	   ) C
+		 WHERE C.ROWNUM BETWEEN #{ startRow } AND #{ endRow }
+	</select>
+</mapper>

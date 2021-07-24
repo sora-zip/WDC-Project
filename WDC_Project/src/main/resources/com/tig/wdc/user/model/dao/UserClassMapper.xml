@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.user.model.dao.UserClassMapper">
+
+    <resultMap type="UserClassDTO" id="ClassResult">
+        <id column="CLS_NO" property="clsNo"/>
+        <result column="CLS_TITLE" property="title"/>
+        <result column="CLS_ADDRESS" property="address"/>
+        <result column="CLS_INTRO" property="intro"/>
+        <result column="CLS_C_EXPL" property="cExpl"/>
+        <result column="CLS_TIME" property="time"/>
+        <result column="CLS_START_D" property="startDate"/>
+        <result column="CLS_END_D" property="endDate"/>
+        <result column="CLS_PRICE" property="price"/>
+        <result column="CLS_ADD_INFO" property="addInfo"/>
+        <result column="CLS_ADD_SUP" property="addSup"/>
+        <result column="CLS_DICSION_STATUS" property="dicsionStatus"/>
+        <result column="CLS_TYPE" property="clsType"/>
+        <result column="DATE_APLCT" property="dateAplct"/>
+        <result column="CLS_STATUS" property="status"/>
+        <result column="TE_NO" property="teNo"/>
+        <result column="CATEGORY_NO" property="categoryNo"/>
+        <result column="CLS_SIMPLE_INTRO" property="simpleIntro"/>
+        <result column="SAVE_PATH" property="titlePic"/>
+        <result column="AVG_SCORE" property="avgScore"/>
+        <result column="D_DAY" property="dDay"/>
+        <result column="LIKE_STATUS" property="likeStatus"/>
+    </resultMap>
+
+	<select id="selectNewClassList" parameterType="UserClassDTO" resultMap="ClassResult">
+		  SELECT 
+                  NVL((SELECT LH.LIKE_STATUS FROM LIKE_HISTORY LH WHERE LH.USER_NO = #{ userNo } AND LH.CLS_NO = X.CLS_NO),'N') AS LIKE_STATUS
+                , X.CLS_TITLE
+                , X.CLS_INTRO
+                , X.CLS_SIMPLE_INTRO
+                , X.CLS_NO
+                , X.CLS_PRICE
+                , X.CLS_TYPE
+                , X.SAVE_PATH
+             FROM (SELECT
+                          C.CLS_TITLE
+                        , C.CLS_INTRO
+                        , C.CLS_SIMPLE_INTRO
+                        , C.CLS_NO
+                        , C.CLS_PRICE
+                        , C.CLS_TYPE
+                        , A.SAVE_PATH
+                     FROM CLASS C
+                     JOIN ATTACHMENT A ON(A.CLS_NO = C.CLS_NO)
+                    WHERE C.CLS_DICSION_STATUS = 'S'
+                      AND (C.CLS_STATUS = 'P'
+                       OR C.CLS_STATUS = 'Y')
+                      AND A.TYPE = 'TITLE'
+                    ORDER BY C.CLS_NO DESC) X
+  <![CDATA[ WHERE ROWNUM  <= 4 ]]>
+	</select>
+	
+	<select id="selectTopClassList" parameterType="UserClassDTO" resultMap="ClassResult">
+	     SELECT 
+	            ROWNUM,
+	            X.* 
+	       FROM (SELECT  
+	                  	NVL((SELECT LH.LIKE_STATUS FROM LIKE_HISTORY LH WHERE LH.USER_NO = #{ userNo } AND LH.CLS_NO = L.CLS_NO),'N') AS LIKE_STATUS
+	                  , C.CLS_TITLE
+	                  , C.CLS_INTRO
+	                  , C.CLS_SIMPLE_INTRO
+	                  , L.RANKING
+	                  , C.CLS_NO
+	                  , C.CLS_PRICE
+	                  , C.CLS_TYPE
+	                  , A.SAVE_PATH
+	               FROM (SELECT
+	                            COUNT(LIKE_NO) AS RANKING
+		                      , CLS_NO
+		                   FROM LIKE_HISTORY
+		                  WHERE LIKE_STATUS = 'Y'
+		                  GROUP BY CLS_NO) L
+		           JOIN CLASS C ON (L.CLS_NO = C.CLS_NO)
+		           JOIN ATTACHMENT A ON(C.CLS_NO = A.CLS_NO)
+		          WHERE A.TYPE = 'TITLE'
+		            AND C.CLS_DICSION_STATUS = 'S'
+		            AND (C.CLS_STATUS = 'P'
+		             OR C.CLS_STATUS = 'Y')
+          		  ORDER BY RANKING DESC) X
+          WHERE ROWNUM <![CDATA[ <= ]]>4 
+	</select>
+	
+	<select id="selectCheerClassList" parameterType="UserClassDTO" resultMap="ClassResult">
+		SELECT 
+		       X.*
+             , NVL((SELECT LH.LIKE_STATUS FROM LIKE_HISTORY LH WHERE LH.USER_NO = #{ userNo } AND LH.CLS_NO = X.CLS_NO),'N') AS LIKE_STATUS
+		     , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+		  FROM (SELECT
+		               *
+		          FROM CLASS C
+		          JOIN ATTACHMENT A ON(A.CLS_NO = C.CLS_NO)
+		          JOIN DISICION_HISTORY DH ON (DH.CLS_NO = C.CLS_NO)
+		         WHERE C.CLS_DICSION_STATUS = 'F'
+		           AND A.TYPE = 'TITLE'
+		           AND (C.CLS_STATUS = 'P'
+                    OR C.CLS_STATUS = 'Y')
+		         ORDER BY C.CLS_NO DESC) X
+		<![CDATA[ WHERE ROWNUM  <= 4 ]]>
+	</select>
+	
+ 	<select id="selectClassDetail" parameterType="_int" resultMap="ClassResult">
+		SELECT
+		       *
+		  FROM CLASS C
+		  JOIN ATTACHMENT A ON(A.CLS_NO = C.CLS_NO)
+		 WHERE A.TYPE = 'TITLE'
+           AND C.CLS_NO = #{ clsNo }
+	</select>
+	
+	<select id="selectClassPic" parameterType="_int" resultMap="ClassResult">
+		SELECT
+		       *
+		  FROM CLASS C
+		  JOIN ATTACHMENT A ON(A.CLS_NO = C.CLS_NO)
+		 WHERE C.CLS_NO = #{ clsNo }
+	</select>  
+	
+	<select id="selectClassStar" parameterType="_int" resultMap="ClassResult">
+		SELECT 
+		       AVG(R.REVIEW_SCORE) AS AVG_SCORE
+		     , S.CLS_NO
+	      FROM REVIEW R
+		  JOIN CLASS_APPLY C ON(R.CLS_APL_NO = C.CLS_APL_NO)
+		  JOIN SCHEDULE S ON(S.SCHEDULE_NO = C.SCHEDULE_NO)
+         WHERE S.CLS_NO = #{ clsNo }
+		 GROUP BY S.CLS_NO
+	</select>  
+	
+	<resultMap type="ClassPieceDTO" id="ClassPieceResult">
+        <id column="PIECE_NO" property="pieceNo"/>
+        <result column="PIECE_TITLE" property="pieceTitle"/>
+        <result column="PIECE_PIC" property="piecePic"/>
+        <result column="CLS_NO" property="clsNo"/>
+    </resultMap>
+    
+    <select id="selectClassPiece" parameterType="_int" resultMap="ClassPieceResult">
+	    SELECT
+	      	   *
+	 	  FROM CLASS_PIECE
+	     WHERE CLS_NO = #{clsNo} 
+    </select>
+    
+    <resultMap type="CurriculumDTO" id="CurriculumResult">
+        <id column="CRCLM_NO" property="curriNo"/>
+        <result column="CRCLM_STEP" property="curriStep"/>
+        <result column="CRCLM_TITLE" property="curriTitle"/>
+        <result column="CRCLM_CONTENT" property="curriContent"/>
+        <result column="CLS_NO" property="clsNo"/>
+    </resultMap>
+    
+    <select id="selectCurriculum" parameterType="_int" resultMap="CurriculumResult">
+	    SELECT
+	      	   *
+	 	  FROM CURRICULUM
+	     WHERE CLS_NO = #{clsNo} 
+	    ORDER BY CRCLM_STEP 
+    </select>
+    
+    <resultMap type="UserReviewDTO" id="ReviewResult">
+        <id column="REVIEW_NO" property="reviewNo"/>
+        <result column="REVIEW_CONTENT" property="reviewContent"/>
+        <result column="REVIEW_PIC" property="reviewPic"/>
+        <result column="REVIEW_SCORE" property="reviewScore"/>
+        <result column="REVIEW_ENROLLDATE" property="reviewEnrollDate"/>
+        <result column="CLS_APL_NO" property="aplNo"/>
+        <result column="USER_NAME" property="userName"/>
+        <!-- 리뷰답변 DTO association 함 -->
+        <association property="answer" javaType="ReviewAnswerDTO">
+        	<id column="RE_ANS_NO" property="ansNo"/>
+	        <result column="RE_ANS_DATE" property="ansDate"/>
+	        <result column="RE_ANS_CONTENT" property="ansContent"/>
+	        <result column="REVIEW_NO" property="reviewNo"/>
+	        <result column="TE_NO" property="teNo"/>
+	        <result column="TE_NAME" property="teName"/>
+	        <result column="TE_PIC" property="tePic"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectReview" parameterType="_int" resultMap="ReviewResult">
+		SELECT
+               R.*
+             , A.*
+		     , T.TE_NAME
+		     , T.TE_PIC
+		     , U.USER_NAME
+		  FROM REVIEW R
+		  LEFT JOIN REVIEW_ANSWER A ON (R.REVIEW_NO = A.REVIEW_NO)
+		  LEFT JOIN TEACHER_INFO T ON (T.TE_NO = A.TE_NO)
+		  LEFT JOIN CLASS_APPLY C ON(R.CLS_APL_NO = C.CLS_APL_NO)
+		  LEFT JOIN SCHEDULE S ON(S.SCHEDULE_NO = C.SCHEDULE_NO)
+		  LEFT JOIN USER_INFO U ON (U.USER_NO = C.USER_NO)
+		 WHERE S.CLS_NO = #{ clsNo }
+		 ORDER BY R.REVIEW_NO DESC
+    </select>
+   
+    <resultMap type="ScheduleDTO" id="ScheduleResult">
+        <id column="SCHEDULE_NO" property="scheduleNo"/>
+        <result column="SCHEDULE_TYPE" property="scheduleType"/>
+        <result column="SCHEDULE_DATE" property="scheduleDate"/>
+        <result column="SCHEDULE_START" property="scheduleStart"/>
+        <result column="MIN_PEOPLE" property="minPeople"/>
+        <result column="MAX_PEOPLE" property="maxPeople"/>
+        <result column="CLS_NO" property="clsNo"/>
+        <result column="SCHEDULE_COUNT" property="scheduleCount"/>
+        <result column="SUM_PPL" property="peopleCount"/>
+    </resultMap>
+    
+    <select id="selectSchedule" parameterType="_int" resultMap="ScheduleResult">
+		SELECT 
+		       * 
+		  FROM SCHEDULE S
+		 WHERE S.CLS_NO = #{ clsNo }
+    </select>
+    
+    <select id="selectOneDayMax" parameterType="_int" resultType="_int">
+        SELECT 
+               MAX(S.MAX_PEOPLE)  
+		  FROM SCHEDULE S
+		 WHERE S.CLS_NO = #{ clsNo }
+    </select>
+    
+    <select id="selectTime" parameterType="ScheduleDTO" resultMap="ScheduleResult">
+        SELECT 
+		       * 
+		  FROM SCHEDULE S
+		 WHERE S.CLS_NO = #{ clsNo }
+           AND SCHEDULE_DATE = #{ scheduleDate }
+    </select>
+    
+    <select id="selectPeople" parameterType="ScheduleDTO" resultMap="ScheduleResult">
+        SELECT 
+		       SUM(A.CLS_PPL) AS SUM_PPL
+             , A.SCHEDULE_NO
+		  FROM SCHEDULE S
+          JOIN CLASS_APPLY A ON (S.SCHEDULE_NO = A.SCHEDULE_NO)
+          JOIN CLASS C ON (C.CLS_NO = S.CLS_NO)
+         WHERE S.SCHEDULE_DATE = #{ scheduleDate }
+           AND S.SCHEDULE_START = #{ scheduleStart }
+           AND C.CLS_NO = #{ clsNo }
+         GROUP BY A.SCHEDULE_NO
+    </select>
+    
+    <select id="selectMaxUserSize" parameterType="scheduleDTO" resultType="_int">
+        SELECT 
+		       S.MAX_PEOPLE
+		  FROM SCHEDULE S
+          JOIN CLASS C ON (C.CLS_NO = S.CLS_NO)
+         WHERE S.SCHEDULE_DATE = #{ scheduleDate }
+           AND S.SCHEDULE_START = #{ scheduleStart }
+           AND C.CLS_NO = #{ clsNo }
+    </select>
+    
+    <select id="selectRegularSchedule" parameterType="_int" resultMap="ScheduleResult">
+		SELECT 
+		       * 
+		  FROM SCHEDULE S
+		 WHERE S.CLS_NO = #{ clsNo }
+    </select>
+    
+    <select id="selectApplyPeople" parameterType="ScheduleDTO" resultMap="ScheduleResult">
+        SELECT 
+		       SUM(A.CLS_PPL) AS SUM_PPL 
+		  FROM CLASS_APPLY A
+		 WHERE A.SCHEDULE_NO = #{ scheduleNo }
+    </select>
+    
+    <resultMap type="UserInquiryDTO" id="InquiryResult">
+        <id column="QUESTION_NO" property="queNo"/>
+        <result column="QUESTION_CONTENT" property="queContent"/>
+        <result column="QUESTION_DATE" property="queDate"/>
+        <result column="QUESTION_VISIABLE_YN" property="queVisibleYn"/>
+        <result column="USER_NAME" property="userName"/>
+        <result column="CLS_NO" property="clsNo"/>
+        <!-- 문의답변 DTO association 함 -->
+        <association property="answer" javaType="InquiryAnswerDTO">
+        	<id column="ANSWER_NO" property="answerNo"/>
+	        <result column="ANSWER_CONTENT" property="answerContent"/>
+	        <result column="QUESTION_NO" property="queNo"/>
+	        <result column="ANSER_TIME" property="answerTime"/>
+	        <result column="TE_NAME" property="teName"/>
+	        <result column="TE_PIC" property="tePic"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectQnA" parameterType="_int" resultMap="InquiryResult">
+        SELECT
+		       U.*
+		     , A.*
+		     , T.TE_NAME
+		     , T.TE_PIC
+		     , I.USER_NAME
+		  FROM USER_TO_TEACHER_Q U
+		  LEFT JOIN CLASS C ON (U.CLS_NO = C.CLS_NO)
+		  LEFT JOIN TE_ANSWER A ON (A.QUESTION_NO = U.QUESTION_NO)
+		  LEFT JOIN TEACHER_INFO T ON (C.TE_NO = T.TE_NO)
+		  LEFT JOIN USER_INFO I ON (U.USER_NO = I.USER_NO)
+		 WHERE C.CLS_NO = #{ clsNo }
+		 ORDER BY U.QUESTION_NO DESC
+    </select>
+    
+    <insert id="insertInquiry" parameterType="UserInquiryDTO">
+	    INSERT 
+	    	INTO USER_TO_TEACHER_Q(QUESTION_NO,QUESTION_CONTENT,QUESTION_DATE,QUESTION_VISIABLE_YN,USER_NO,CLS_NO)
+		VALUES
+		( 
+		  SEQ_QUESTION_NO.NEXTVAL
+		, #{ queContent }
+		, SYSDATE
+		, 'Y'
+		, #{ userNo }
+		, #{ clsNo }
+		)
+    </insert>
+    
+	<select id="selectscheduleNo" parameterType="ScheduleDTO" resultMap="ScheduleResult">
+		SELECT
+		       S.*
+		  FROM SCHEDULE S
+		  JOIN CLASS C ON(S.CLS_NO = C.CLS_NO)
+		 WHERE S.SCHEDULE_START = SUBSTR(#{stringScheduleDate},12,15)
+		 <if test='scheduleClsType == "O"'>		 
+		   AND S.SCHEDULE_DATE = SUBSTR(#{stringScheduleDate},0,10)
+		 </if>
+		 <if test='scheduleClsType == "R"'>		 
+		   AND C.CLS_START_D = SUBSTR(#{stringScheduleDate},0,10)
+		 </if>
+		   AND S.CLS_NO = #{ clsNo }
+	</select>
+    
+	<insert id="insertClassApply" parameterType="ClassApplyDTO">
+		INSERT
+	      INTO CLASS_APPLY
+		VALUES
+		(
+		  SEQ_CLS_APL_NO.NEXTVAL
+		, #{ ppl }
+		, SYSDATE
+		, #{ userNo }
+		, DEFAULT
+		, #{ scheduleNo }
+		)
+	</insert>
+	
+	<insert id="insertPayment" parameterType="PaymentDTO">
+		<selectKey keyProperty="clsAplNo" resultType="_int" order="BEFORE">
+			SELECT
+			      SEQ_CLS_APL_NO.CURRVAL
+			FROM DUAL
+	 	</selectKey>
+		INSERT
+		  INTO PAYMENT
+		VALUES
+		(
+		  SEQ_PAY_NO.NEXTVAL
+		, #{ payPrice }
+		, '카카오페이'
+		, SYSDATE	
+		<if test='cpnNo == "0"'>
+		, null
+		</if>
+		<if test='cpnNo != "0"'>		
+		, #{ cpnNo }
+		</if>
+		, '완료'
+		, #{ clsAplNo }
+		)
+	</insert>
+	
+	 <resultMap type="UserCouponDTO" id="CouponResult">
+    	<id column="CPN_NO" property="cpnNo"/>
+    	<result column="CPN_NAME" property="cpnName"/>
+        <result column="DIS_AMOUNT" property="disAmount"/>
+        <result column="DIS_CONDITION" property="disCondition"/>
+        <result column="CPN_START" property="cpnStart"/>
+        <result column="CPN_END" property="cpnEnd"/>
+        <result column="CPN_USE_YN" property="cpnUseYn"/>
+        <result column="CHEERING_NO" property="cheeringNo"/>
+        <result column="USER_NO" property="userNo"/>
+        <result column="CPN_ISSUE_DATE" property="issuedDate"/>
+        <result column="CLS_TITLE" property="couponClassName"/>
+    </resultMap>
+    
+	<update id="updateCpnUseYn" parameterType="_int">
+		UPDATE COUPON
+		   SET CPN_USE_YN = 'Y'
+		 WHERE CPN_NO = #{ cpnNo }
+	</update>
+	
+	<select id="selectCouponList" parameterType="UserClassDTO" resultMap="CouponResult">
+		SELECT 
+		       *
+		  FROM COUPON A
+		  JOIN CHEERING_HISTORY H ON(A.CHEERING_NO = H.CHEERING_NO)
+		  JOIN CLASS C ON(H.CLS_NO = C.CLS_NO)
+		 WHERE A.USER_NO = #{ userNo }
+		   AND CPN_USE_YN = 'N'
+           AND H.CLS_NO = #{ clsNo }
+		 ORDER BY CPN_NO
+	</select>
+	
+	<resultMap type="UserReportDTO" id="ReportResult">
+		<id column="REPORT_NO" property="reportNo"/>
+		<result column="REPORT_TITLE" property="reportTitle"/>
+		<result column="REPORT_REASON" property="reportReason"/>
+		<result column="REPORT_TYPE" property="reportType"/>
+		<result column="REPORT_FROM_NO" property="reportFromNo"/>
+		<result column="REPORT_TO_NO" property="reportToNo"/>
+		<result column="REPORT_PIC" property="reportPic"/>
+		<result column="PROCS_STATUS" property="status"/>
+		<result column="REPORT_DATE" property="reportDate"/>
+		<result column="RNUM" property="rowNum"/>
+		<result column="REPORT_ANSWER" property="reportAnswer"/>
+	</resultMap>
+	
+	<insert id="insertReport" parameterType="UserReportDTO">
+       INSERT 
+         INTO REPORT
+       VALUES
+       (
+         SEQ_REPORT_NO.NEXTVAL
+       , #{ reportTitle }
+       , #{ reportReason }
+       , '수강생'
+       , #{ reportFromNo }
+       , #{ reportToNo }
+       , #{ reportPic }
+       , DEFAULT
+       , SYSDATE
+       )
+	</insert>
+	
+	<insert id="insertReportHistory" parameterType="UserReportDTO">
+		<selectKey keyProperty="reportNo" resultType="_int" order="BEFORE">
+			SELECT
+        		   SEQ_REPORT_NO.CURRVAL
+			  FROM DUAL
+	 	</selectKey>
+	   INSERT
+	     INTO TE_REPORT_HISTORY
+	   VALUES
+	   (
+	     #{ reportToNo }
+	   , #{ reportNo }
+	   )
+	</insert>
+	
+	<insert id="inserRefund" parameterType="UserRefundDTO">
+	   INSERT
+	     INTO PAYMENT_CANCEL
+	   VALUES
+	   (
+	     SEQ_CANCLE_NO.NEXTVAL
+	   , #{ cancelReason }
+	   , #{ refundAmount }
+	   , NULL
+	   , #{ cancelReasonDetail }
+	   , #{ payNo }
+	   , #{ refundAccount }
+	   , #{ accountHolder }
+	   , #{ bank }
+	   , DEFAULT
+	   , SYSDATE
+	   )
+	</insert>
+	
+	<update id="updatePaymentStatus" parameterType="_int">
+	  UPDATE PAYMENT
+	     SET PAY_STATUS = '취소'
+	   WHERE PAY_NO = #{ payNo }
+	</update>
+	
+	<select id="selectCheerHistory" parameterType="UserClassDTO" resultType="_int">
+	   SELECT
+		      COUNT(DECODE(CHEERING_STATUS,'Y',1)) count
+		FROM CHEERING_HISTORY CH
+	    JOIN USER_INFO U ON(CH.USER_NO = U.USER_NO)
+	    JOIN CLASS C ON(CH.CLS_NO = C.CLS_NO)
+	   WHERE C.CLS_NO = #{ clsNo }
+	     AND U.USER_NO = #{ userNo }
+	</select>
+	
+	<insert id="insertCheerHistory" parameterType="UserClassDTO">
+	   INSERT
+	     INTO CHEERING_HISTORY
+	   VALUES
+	   (
+	     SEQ_CHEERING_NO.NEXTVAL
+	   , #{ clsNo }
+	   , 'Y'
+	   , #{ userNo }
+	   , SYSDATE
+	   )
+	</insert>
+	
+    <resultMap type="UserClassDTO" id="UserCategoryResult">
+        <id column="CLS_NO" property="clsNo"/>
+        <result column="CLS_TITLE" property="title"/>
+        <result column="CLS_ADDRESS" property="address"/>
+        <result column="CLS_INTRO" property="intro"/>
+        <result column="CLS_C_EXPL" property="cExpl"/>
+        <result column="CLS_TIME" property="time"/>
+        <result column="CLS_START_D" property="startDate"/>
+        <result column="CLS_END_D" property="endDate"/>
+        <result column="CLS_PRICE" property="price"/>
+        <result column="CLS_ADD_INFO" property="addInfo"/>
+        <result column="CLS_ADD_SUP" property="addSup"/>
+        <result column="CLS_DICSION_STATUS" property="dicsionStatus"/>
+        <result column="CLS_TYPE" property="clsType"/>
+        <result column="DATE_APLCT" property="dateAplct"/>
+        <result column="CLS_STATUS" property="status"/>
+        <result column="TE_NO" property="teNo"/>
+        <result column="CATEGORY_NO" property="categoryNo"/>
+        <result column="CLS_SIMPLE_INTRO" property="simpleIntro"/>
+        <result column="SAVE_PATH" property="titlePic"/>
+        <result column="D_DAY" property="dDay"/>
+        <result column="SCHEDULE_DATE" property="scheduleDate"/>
+        <result column="SCHEDULE_START" property="scheduleStart"/>
+        <result column="CLS_PPL" property="clsPplAmount"/>
+        <result column="PAY_PRICE" property="payPrice"/>
+        <result column="CLS_APL_NO" property="aplNo"/>
+        <result column="TE_NAME" property="teName"/>
+        <result column="CLS_APL_D" property="clsAplDate"/>
+        <result column="CLS_PPL" property="ppl"/>
+        <result column="PAY_STATUS" property="payStatus"/>
+        <result column="REFUND_AMOUNT" property="refundAmount"/>
+        <result column="REFUND_STATUS" property="refundStatus"/>
+        <result column="PAY_NO" property="payNo"/>
+        <result column="D_DAY" property="dDay"/>
+    </resultMap>
+    
+	<select id="selectMyCheerClassList" parameterType="_int" resultMap="UserCategoryResult">
+      SELECT
+             C.*
+           , T.*
+           , SUBSTR(((DH.DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+        FROM CHEERING_HISTORY CH
+	    JOIN USER_INFO U ON(CH.USER_NO = U.USER_NO)
+	    JOIN CLASS C ON(CH.CLS_NO = C.CLS_NO)
+        JOIN DISICION_HISTORY DH ON (DH.CLS_NO = C.CLS_NO)
+        JOIN ATTACHMENT T ON(C.CLS_NO = T.CLS_NO)
+       WHERE U.USER_NO = #{ userNo }
+         AND CLS_DICSION_STATUS = 'F'
+         AND SUBSTR(((DH.DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) != '-'
+         AND SUBSTR(((DH.DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) != '0'
+         AND T.TYPE = 'TITLE'	
+         <![CDATA[
+         AND C.CLS_END_D > SYSDATE
+          ]]>
+	</select>
+	
+	<select id="selectMyLikeClassList" parameterType="PageInfoDTO" resultMap="UserCategoryResult">
+		SELECT
+		      *
+		  FROM (SELECT
+		               ROWNUM RNUM
+		             , X.*
+		         FROM (SELECT
+		                      C.*
+		                    , L.LIKE_NO
+		                    , L.LIKE_STATUS
+		                    , T.SAVE_PATH
+		                    , SUBSTR(((DH.DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+		                FROM LIKE_HISTORY L
+		                JOIN CLASS C ON(L.CLS_NO = C.CLS_NO)
+		                JOIN DISICION_HISTORY DH ON (DH.CLS_NO = C.CLS_NO)
+		                JOIN ATTACHMENT T ON(C.CLS_NO = T.CLS_NO)
+		               WHERE L.USER_NO = #{ userNo }
+		                 AND L.LIKE_sTATUS = 'Y'
+		                 AND (C.CLS_DICSION_STATUS = 'F'
+		                  OR C.CLS_DICSION_STATUS = 'S')
+		                 AND T.TYPE = 'TITLE'
+		                 <![CDATA[
+		                 AND C.CLS_END_D > SYSDATE
+		                 ]]>
+		               ORDER BY LIKE_NO DESC) X) Y
+		 WHERE RNUM BETWEEN #{ startRow } AND #{ endRow }
+	</select>
+	
+	
+	<resultMap type="UserRefundDTO" id="UserRefundDTOResult">
+        <id column="CANCLE_NO" property="cancelNo"/>
+        <result column="CANCLE_REASON" property="cancelReason"/>
+        <result column="REFUND_AMOUNT" property="refundAmount"/>
+        <result column="REFUND_DATE" property="refundDate"/>
+        <result column="CANCLE_REASON_DETAIL" property="cancelReasonDetail"/>
+        <result column="PAY_NO" property="payNo"/>
+        <result column="REFUND_ACCOUNT" property="refundAccount"/>
+        <result column="REFUND_HOLDER" property="accountHolder"/>
+        <result column="REFUND_BANK" property="bank"/>
+        <result column="REFUND_STATUS" property="refundStatus"/>
+        <result column="REFUND_APPLY_DATE" property="refundApplyDate"/>
+        <result column="MAX_STEP" property="maxStep"/>
+        <result column="SCHEDULE_COUNT" property="scheduleCount"/>
+        
+	</resultMap>
+	
+	<select id="selectMaxStep" parameterType="_int" resultMap="UserRefundDTOResult">
+		SELECT
+		       MAX(CLASS_STEP) MAX_STEP
+		     , S.SCHEDULE_COUNT SCHEDULE_COUNT
+		  FROM REGULAR_CLASS R
+		  JOIN SCHEDULE S ON(S.SCHEDULE_NO = R.SCHEDULE_NO)
+		 WHERE R.SCHEDULE_NO = #{ scheduleNo }
+		   AND S.SCHEDULE_NO = #{ scheduleNo }
+		 GROUP BY S.SCHEDULE_COUNT
+	</select>
+	
+	<select id="selectDoTodayCheer" parameterType="_int" resultType="_int">
+		SELECT 
+		       COUNT(CHEER_DATE)
+		  FROM CHEERING_HISTORY
+		 WHERE TO_DATE(CHEER_DATE,'yy/MM/dd') = TO_DATE(SYSDATE,'yy/MM/dd')
+		   AND USER_NO = #{ userNo }
+	</select>
+	
+	<select id="selectUserCpnNo" parameterType="_int" resultType="_int">
+	      SELECT
+                 USER_NO
+            FROM COUPON
+           WHERE CPN_NO = #{ cpnNo }
+	</select>
+	
+	<insert id="insertAllUserCoupon" parameterType="UserCouponDTO">
+	    INSERT
+	      INTO ALL_USER_COUPON
+	    VALUES
+	    (
+	      SEQ_USE_NO.NEXTVAL
+	    , #{ cpnNo }
+	    , #{ userNo }
+	    )
+	</insert>
+	
+	<select id="selectClassProgressCount" parameterType="_int" resultType="_int">
+		SELECT
+		       COUNT(CLASS_STEP)
+		  FROM REGULAR_CLASS R
+		 WHERE R.SCHEDULE_NO = #{ scheduleNo }
+	</select>
+	
+
+	<insert id="insertTuitionManagement" parameterType="PaymentDTO">
+		<selectKey keyProperty="payNo" resultType="_int" order="BEFORE">
+			SELECT
+			      SEQ_PAY_NO.CURRVAL
+			FROM DUAL
+	 	</selectKey>
+		INSERT
+		  INTO TUITION_MANAGEMENT
+		VALUES
+		(
+		   SEQ_TUITION_M_NO.NEXTVAL
+		, #{ payPrice }
+		, #{ clsAplNo }
+		, #{ payNo }
+		, 'N'
+
+		)
+	</insert>
+	
+	<select id="selectCheerCount" parameterType="_int" resultType="_int">
+          SELECT 
+		         COUNT(*)
+		    FROM CHEERING_HISTORY
+		   WHERE CLS_NO = #{ clsNo }
+	</select>
+	
+	<update id="updateUserWithdraw" parameterType="_int">
+       UPDATE USER_INFO
+          SET USER_QUIT_YN = 'Y'
+        WHERE USER_NO = #{ userNo }
+	</update>
+
+	<select id="selectClassUpdate" parameterType="hashmap" resultType="string">
+        SELECT
+               UPDATE_NO
+          FROM CLASS_UPDATE
+         WHERE UPDATE_DATE = #{ today }      	
+	</select>
+	<update id="updateClass" parameterType="hashmap">
+	    UPDATE CLASS
+           SET CLS_STATUS = 'E'
+         WHERE CLS_DICSION_STATUS = 'S'
+           AND CLS_STATUS = 'P'
+           AND CLS_END_D = #{ yesterday }
+	</update>
+	<update id="updateStartClass" parameterType="hashmap">
+	    UPDATE CLASS
+           SET CLS_STATUS = 'P'
+         WHERE CLS_DICSION_STATUS = 'S'
+           AND CLS_STATUS = 'Y'
+           AND CLS_START_D = #{ today }	
+	</update>
+	<insert id="insertUpdateClass" parameterType="hashmap">
+	    INSERT
+	      INTO CLASS_UPDATE
+	    VALUES
+	         (
+	           SEQ_UPDATE_NO.NEXTVAL
+	         , #{ today }  
+	         )  
+	</insert>
+	
+	<update id="updatePplZero" parameterType="_int">
+	   UPDATE CLASS_APPLY
+	      SET CLS_PPL = 0
+	    WHERE CLS_APL_NO = #{ aplNo } 
+	</update>
+	
+	<select id="selectLikeStatus" parameterType="UserClassDTO" resultType="String">
+		SELECT
+		       LIKE_STATUS
+		  FROM LIKE_HISTORY
+		 WHERE USER_NO = #{ userNo }
+		   AND CLS_NO = #{ clsNo }
+	</select>
+</mapper>

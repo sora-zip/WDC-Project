@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.teacher.model.dao.BoardAndQnAMapper">
+
+    <resultMap type="notice" id="noticeInfo">
+        <id column="NOTICE_NO" property="no"/>
+        <result column="NOTICE_TITLE" property="title"/>
+        <result column="NOTICE_CONTENT" property="content"/>
+        <result column="WRITE_DATE" property="writeDate"/>
+        <result column="NOTICE_TYPE" property="type"/>
+        <result column="IMPORTANT_YN" property="important"/>
+        <result column="ADMIN_NO" property="adminNo"/>
+    </resultMap>
+    <resultMap type="classInfo" id="classInfo">
+        <id column="CLS_NO" property="clsNo"/>
+        <result column="CLS_TITLE" property="title"/>
+        <result column="CLS_ADDRESS" property="address"/>
+        <result column="CLS_INTRO" property="intro"/>
+        <result column="CLS_C_EXPL" property="cExpl"/>
+        <result column="CLS_TIME" property="time"/>
+        <result column="CLS_START_D" property="startDate"/>
+        <result column="CLS_END_D" property="endDate"/>
+        <result column="CLS_PRICE" property="price"/>
+        <result column="CLS_ADD_INFO" property="addInfo"/>
+        <result column="CLS_ADD_SUP" property="addSup"/>
+        <result column="CLS_DICSION_STATUS" property="dicsionStatus"/>
+        <result column="CLS_TYPE" property="clsType"/>
+        <result column="DATE_APLCT" property="dateAplct"/>
+        <result column="CLS_STATUS" property="status"/>
+        <result column="TE_NO" property="teNo"/>
+        <result column="CATEGORY_NO" property="categoryNo"/>
+        <result column="CLS_SIMPLE_INTRO" property="simpleIntro"/>
+        <association property="schedule" javaType="com.tig.wdc.user.model.dto.ScheduleDTO">
+            <result column="SCHEDULE_TYPE" property="scheduleType"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectNoticeCount" resultType="_int">
+        SELECT 
+               COUNT(NOTICE_NO) 
+          FROM NOTICE 
+         WHERE NOTICE_TYPE IN('A','T')    
+    </select>
+	<select id="selectNoticeList" parameterType="paging" resultMap="noticeInfo">
+        SELECT 
+               A.NOTICE_NO
+             , A.NOTICE_TITLE
+             , A.WRITE_DATE
+             , A.IMPORTANT_YN
+          FROM (SELECT ROWNUM RNUM
+                      , B.NOTICE_NO
+                      , B.NOTICE_TITLE
+                      , B.WRITE_DATE
+                      , B.IMPORTANT_YN
+                  FROM (SELECT C.NOTICE_NO
+                             , C.NOTICE_TITLE
+                             , C.WRITE_DATE
+                             , C.IMPORTANT_YN
+                          FROM NOTICE C
+                         WHERE C.NOTICE_TYPE IN('A','T')
+                         ORDER BY C.IMPORTANT_YN DESC, C.NOTICE_NO DESC
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ startRow } AND #{ endRow }	
+	</select>
+	<select id="selectClassCount" resultType="_int" parameterType="hashmap">
+        SELECT 
+               COUNT(CLS_NO) 
+          FROM CLASS 
+         WHERE TE_NO = #{ teacherNo }
+         <if test="classType != null and classType != 'none'">
+           AND CLS_TYPE = #{ classType }
+         </if>
+         <if test="decision != null and decision != 'none'">
+           AND CLS_DICSION_STATUS = #{ decision }
+         </if>
+         <if test="proceed != null and proceed != 'none'">
+           AND CLS_STATUS = #{ proceed }
+         </if>
+    </select>
+    <select id="selectClassList" parameterType="hashmap" resultMap="classInfo">
+        SELECT 
+               A.CLS_NO
+             , A.CLS_TITLE
+             , A.CLS_TYPE
+             , A.CLS_PRICE
+             , A.CLS_STATUS
+             , A.CLS_DICSION_STATUS
+             , A.SCHEDULE_TYPE
+          FROM (SELECT ROWNUM RNUM
+                     , B.CLS_NO
+                     , B.CLS_TITLE
+                     , B.CLS_TYPE
+                     , B.CLS_PRICE
+                     , B.CLS_STATUS
+                     , B.CLS_DICSION_STATUS
+                     , B.SCHEDULE_TYPE
+                  FROM (SELECT DISTINCT(C.CLS_NO)
+                             , C.CLS_TITLE
+                             , C.CLS_TYPE
+                             , C.CLS_PRICE
+                             , C.CLS_STATUS
+                             , C.CLS_DICSION_STATUS
+                             , D.SCHEDULE_TYPE
+                          FROM CLASS C
+                          JOIN SCHEDULE D ON (C.CLS_NO = D.CLS_NO)
+                         WHERE C.TE_NO = #{ teacherNo }
+                         <if test="classType != null and classType != 'none'">
+                           AND CLS_TYPE = #{ classType }
+                         </if>
+                         <if test="decision != null and decision != 'none'">
+                           AND CLS_DICSION_STATUS = #{ decision }
+                         </if>
+                         <if test="proceed != null and proceed != 'none'">
+                           AND CLS_STATUS = #{ proceed }
+                         </if>
+                         ORDER BY C.CLS_NO DESC
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ pageInfo.startRow } AND #{ pageInfo.endRow }  
+    </select>
+    <select id="selectScheduleCount" resultType="_int">
+        SELECT 
+               COUNT(SCHEDULE_NO)
+          FROM SCHEDULE
+         WHERE CLS_NO = #{ clsNo }  
+    </select>
+    <select id="selectAdminQnACount" resultType="_int">
+        SELECT 
+               COUNT(Q_NO) 
+         FROM ADMIN_Q 
+        WHERE MEMBER_TYPE = 'TEACHER' 
+          AND MEMBER_NO = #{ teacherNo }
+        <if test="inquiryReply != null and inquiryReply != 'none'">
+          AND ANSWER_YN = #{ inquiryReply }
+        </if>
+    </select>
+    <resultMap type="UserInquiryDTO" id="inquiry">
+    	<id column="문의번호" property="queNo"/>
+		<result column="제목" property="queTitle"/>
+		<result column="문의날짜" property="queDate"/>
+		<result column="답변여부" property="answerYn"/>
+		<result column="내용" property="queContent"/>
+		<result column="공개여부" property="queVisibleYn"/>
+		<result column="문의자번호" property="userNo"/>
+		<result column="작성자" property="userName"/>
+		<association property="answer" javaType="InquiryAnswerDTO">
+			<id column="문의번호" property="queNo"/>
+	        <result column="답변내용" property="answerContent"/>
+	        <result column="답변날짜" property="answerTime"/>
+		</association>
+    </resultMap>
+    <select id="selectAdminQnAList" resultMap="inquiry" parameterType="hashmap">
+        SELECT 
+               A.*
+          FROM (SELECT ROWNUM RNUM
+                     , B.*
+                  FROM (SELECT C.Q_TITLE 제목
+                             , C.Q_CONTENT 내용
+                             , C.Q_DATE 문의날짜
+                             , C.ANSWER_YN 답변여부
+                             , C.MEMBER_TYPE 문의자타입
+                             , C.MEMBER_NO 문의자번호
+                             , C.Q_NO 문의번호
+                          FROM ADMIN_Q C
+                         WHERE C.MEMBER_NO = #{ teacherNo }
+                           AND MEMBER_TYPE = 'TEACHER'
+                         <if test="inquiryReply != null and inquiryReply != 'none'">
+                           AND C.ANSWER_YN = #{ inquiryReply }
+                         </if>                           
+                         ORDER BY C.Q_NO DESC
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ pageInfo.startRow } AND #{ pageInfo.endRow }
+    </select>
+    <select id="selectQnADetail" resultMap="inquiry" parameterType="hashmap">
+        SELECT 
+               A.Q_NO 문의번호
+             , A.Q_TITLE 제목
+             , A.Q_CONTENT 내용
+             , A.Q_DATE 문의날짜
+             , A.ANSWER_YN 답변여부
+             <if test='"Y".equals(answer)'>
+             , B.ANSWER_CONTENT 답변내용
+             , B.ANSWER_DATE 답변날짜
+             </if>
+          FROM ADMIN_Q A
+          <if test='"Y".equals(answer)'>
+          JOIN ADMIN_Q_ANSWER B ON (A.Q_NO = B.Q_NO)
+          </if>
+         WHERE A.Q_NO = #{ questinoNo }
+    </select>
+    <insert id="insertAdminQuestion" parameterType="QuestionDTO">
+        INSERT 
+          INTO ADMIN_Q
+        VALUES 
+             ( #{ questionTitle }
+             , #{ questionContent }
+             , SYSDATE
+             , 'N'
+             , 'TEACHER'
+             , #{ questionId }
+             , SEQ_Q_NO.NEXTVAL
+             )    
+    </insert>
+    <insert id="insertAdminQuestionHistory" parameterType="QuestionDTO">
+        <selectKey keyProperty="questionNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_Q_NO.CURRVAL
+              FROM DUAL
+        </selectKey>
+            INSERT
+              INTO TE_TO_ADMIN_Q
+            VALUES 
+                 ( #{ questionId }
+                 , #{ questionNo }
+                 ) 
+    </insert>
+    <select id="selectNoticeDetail" parameterType="_int" resultMap="noticeInfo">
+        SELECT
+               A.NOTICE_NO
+             , A.NOTICE_TITLE
+             , A.NOTICE_CONTENT
+             , A.WRITE_DATE
+             , A.IMPORTANT_YN
+             , A.NOTICE_TYPE
+          FROM NOTICE A
+         WHERE NOTICE_NO = #{ noticeNo }         
+    </select>
+    <select id="selectUserInquiryCount" resultType="_int" parameterType="hashmap">
+        SELECT 
+                COUNT(A.QUESTION_NO)
+          FROM USER_TO_TEACHER_Q A
+          LEFT JOIN TE_ANSWER B ON (A.QUESTION_NO = B.QUESTION_NO)
+         WHERE A.CLS_NO  = #{ clsNo }
+         <if test="replyStatus == 'yet'">
+           AND B.ANSWER_CONTENT IS NULL
+         </if>
+         <if test="replyStatus == 'complete'">
+           AND B.ANSWER_CONTENT IS NOT NULL
+         </if>
+    </select>
+    <select id="selectinquiryList" resultMap="inquiry" parameterType="hashmap">
+        SELECT 
+               A.*
+          FROM (SELECT ROWNUM RNUM
+                     , B.*
+                  FROM (SELECT C.QUESTION_NO 문의번호
+                             , C.QUESTION_CONTENT 내용
+                             , C.QUESTION_DATE 문의날짜
+                             , C.QUESTION_VISIABLE_YN 공개여부
+                             , C.USER_NO 문의자번호
+                             , D.ANSWER_CONTENT 답변내용
+                             , E.USER_NAME 작성자
+                          FROM USER_TO_TEACHER_Q  C
+                          LEFT JOIN TE_ANSWER D ON (C.QUESTION_NO = D.QUESTION_NO)
+                          JOIN USER_INFO E ON (C.USER_NO = E.USER_NO)
+                         WHERE C.CLS_NO  = #{ clsNo }
+                         <if test="replyStatus == 'yet'">
+                           AND D.ANSWER_CONTENT IS NULL
+                         </if>
+                         <if test="replyStatus == 'complete'">
+                           AND D.ANSWER_CONTENT IS NOT NULL
+                         </if>                         
+                         ORDER BY C.QUESTION_NO DESC
+                        ) B
+               ) A
+         WHERE A.RNUM BETWEEN #{ pageInfo.startRow } AND #{ pageInfo.endRow } 
+    </select>
+    <select id="selectOneInquiry" resultMap="inquiry" parameterType="hashmap">
+        SELECT
+               A.QUESTION_NO 문의번호
+             , A.QUESTION_CONTENT 내용
+             , A.QUESTION_DATE 문의날짜
+             , A.QUESTION_VISIABLE_YN 공개여부
+             , A.USER_NO 문의자번호
+             , B.ANSWER_CONTENT 답변내용
+             , B.ANSER_TIME 답변날짜
+             , C.USER_NAME 작성자
+          FROM USER_TO_TEACHER_Q A
+          LEFT JOIN TE_ANSWER B ON (A.QUESTION_NO = B.QUESTION_NO)
+          JOIN USER_INFO C ON (A.USER_NO = C.USER_NO)
+         WHERE A.QUESTION_NO = #{queNo}
+    </select>
+    <insert id="insertInquiryAnswer" parameterType="InquiryAnswerDTO">
+        INSERT
+          INTO TE_ANSWER
+        VALUES
+             (
+               SEQ_ANSWER_NO.NEXTVAL
+             , #{ answerContent }
+             , #{ queNo }
+             , SYSDATE  
+             )  
+    </insert>
+    <insert id="insertReportUser" parameterType="UserReportDTO">
+        INSERT
+          INTO REPORT
+        VALUES
+             (
+               SEQ_REPORT_NO.NEXTVAL
+             , #{ reportTitle }
+             , #{ reportReason }
+             , #{ reportType }
+             , #{ reportFromNo }
+             , #{ reportToNo }
+             , null
+             , #{ status }
+             , SYSDATE  
+             )  
+    </insert>
+    <insert id="insertReportHistory" parameterType="UserReportDTO">
+        <selectKey keyProperty="reportNo" order="BEFORE" resultType="_int">
+            SELECT
+                   SEQ_REPORT_NO.CURRVAL
+              FROM DUAL
+        </selectKey>  
+        INSERT
+          INTO USER_REPORT_HISTORY
+        VALUES
+             (
+               #{ reportToNo }  
+             , #{ reportNo }
+             )  
+    </insert>
+</mapper>

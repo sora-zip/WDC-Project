@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.admin.model.dao.AdminMapper">
+	
+	<resultMap id="totalDTO" type="TotalDTO">
+		<id column="TE_NO" property="userNo"/>
+		<result column="TE_ID" property="userId"/>
+		<result column="TE_NAME" property="userName"/>
+		<result column="TE_ENROLL_DATE" property="enrollDate"/>
+		<result column="TYPE" property="userType"/>
+		<result column="누적신고"  property="reportedCnt"/>
+		<result column="BLOCK_YN"  property="blackYn"/>
+	</resultMap>
+	
+	<resultMap id="userDTO" type="TotalDTO">
+		<id column="USER_NO" property="userNo"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="USER_NAME" property="userName"/>
+		<result column="USER_ENROLL_DATE" property="enrollDate"/>
+		<result column="TYPE" property="userType"/>
+		<result column="누적신고"  property="reportedCnt"/>
+		<result column="BLOCK_YN"  property="blackYn"/>
+	</resultMap>
+	
+	<resultMap type="StudentDTO" id="studentDTO">
+		<id column="USER_NO" property="studentnNo"/>
+		<result column="USER_ID" property="id"/>
+		<result column="TYPE" property="type"/>
+		<result column="USER_NAME" property="studentName"/>
+		<result column="USER_PHONE" property="phone"/>
+		<result column="USER_BIRTH"  property="birth"/>
+		<result column="USER_ENROLL_DATE"  property="enrollDate"/>
+		<result column="누적신고"  property="reportedCnt"/>
+		<result column="BLOCK_YN"  property="blockYn"/>
+	</resultMap>
+
+	<resultMap id="classLsit" type="ClassDTO">
+		<id column="CLS_NO" property="classNo"/>
+		<result column="CLS_TITLE" property="classTitle"/>
+		<result column="TE_NAME" property="teacherName"/>
+		<result column="CLS_PRICE" property="classPrice"/>
+		<result column="CLS_TYPE" property="classType"/>
+		<result column="CLS_STATUS" property="decisionStatus"/>
+		<result column="CLS_DICSION_STATUS" property="classDicsionStatus"/>
+	</resultMap>
+	
+	<resultMap id="reportList" type="ReportDTO">
+		<id column="REPORT_NO" property="reportNo"/>
+		<result column="REPORT_TITLE" property="reportTitle"/>
+		<result column="REPORT_TYPE" property="reportType"/>
+		<result column="TE_ID" property="reportId"/>
+		<result column="REPORT_DATE" property="reportDate"/>
+		<result column="PROCS_STATUS" property="reportStatus"/>
+	</resultMap>
+	
+	<!-- 문의 -->
+	<resultMap id="questionList" type="QuestionDTO" >
+		<id column="Q_NO" property="questionNo"/>
+		<result column="유형" property="questionType"/>
+		<result column="이름" property="questionName"/>
+		<result column="아이디" property="questionId"/>
+		<result column="제목" property="questionTitle"/>
+		<result column="날짜" property="questionDate"/>
+		<result column="답변여부" property="answerYN"/>
+	</resultMap>
+	
+	<!-- 문의상세 -->
+	<resultMap id="questionInfoDetail" type="QuestionDTO">
+		<id column="Q_NO" property="questionNo"/>
+		<result column="번호" property="userNo"/>
+		<result column="MEMBER_TYPE" property="questionType"/>
+		<result column="이름" property="questionName"/>
+		<result column="아이디" property="questionId"/>
+		<result column="Q_TITLE" property="questionTitle"/>
+		<result column="Q_CONTENT" property="questionContent"/>
+		<result column="ANSWER_CONTENT" property="questionReContent"/>
+	</resultMap>
+	
+	<resultMap id="teacherDTO" type="TeacherDTO" >
+		<id column="TE_NO" property="teNo"/>
+		<result column="TE_ID" property="id"/>
+		<result column="TE_NAME" property="name"/>
+		<result column="TYPE" property="usertype"/>
+		<result column="TE_PHONE"  property="phone"/>
+		<result column="TE_TYPE"  property="teacherType"/>
+		<result column="TE_ENROLL_DATE"  property="enrollDate"/>
+		<result column="TE_INTRO"  property="teacherIntro"/>
+		<result column="TE_PIC"  property="imgPath"/>
+		<result column="누적신고"  property="reportedCnt"/>
+		<result column="BLOCK_YN"  property="blockYn"/>
+	</resultMap>
+	
+	<!-- 쿠폰 -->
+	<resultMap id="couponList" type="CouponDTO">
+		<id column="CPN_NO" property="couponNo"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="CPN_NAME" property="couponName"/>
+		<result column="DIS_AMOUNT" property="disamount"/>
+		<result column="CPN_ISSUE_DATE" property="issueDate"/>
+		<result column="CPN_START" property="startDate"/>
+		<result column="CPN_END" property="endDate"/>
+		<result column="CPN_USE_YN" property="useStatus"/>
+	</resultMap>
+	
+	<!-- 쿠폰 상세 -->
+	<resultMap id="couponInfoDetail" type="CouponDTO">
+		<id column="USER_ID" property="userId"/>
+		<result column="CPN_NAME" property="couponName"/>
+		<result column="CPN_START" property="startDate"/>
+		<result column="CPN_END" property="endDate"/>
+		<result column="DIS_AMOUNT" property="disamount"/>
+		<result column="총합" property="cntUseUser"/>
+	</resultMap>
+	
+	<!-- 공지 -->
+	<resultMap id="noticeList" type="NoticeDTO">
+		<id column="NOTICE_NO" property="noticeNo"/>
+		<result column="NOTICE_TYPE" property="noticeType"/>
+		<result column="IMPORTANT_YN" property="importantYN"/>
+		<result column="NOTICE_TITLE" property="noticeTitle"/>
+		<result column="WRITE_DATE" property="writeDate"/>
+	</resultMap>
+	
+	<!-- 공지 상세 -->
+	<resultMap id="noticeInfoDetail" type="NoticeDTO">
+		<id column="NOTICE_TYPE" property="noticeType"/>
+		<result column="NOTICE_TITLE" property="noticeTitle"/>
+		<result column="NOTICE_CONTENT" property="noticeContent"/>
+		<result column="IMPORTANT_YN" property="importantYN"/>
+		<result column="NOTICE_NO" property="noticeNo"/>
+	</resultMap>
+	
+	<!-- 정산 -->
+	<resultMap id="calculateList" type="CalculateDTO">
+		<id column="번호" property="calcNo"/>
+		<result column="TE_TYPE" property="teType"/>
+		<result column="TE_NAME" property="teName"/>
+		<result column="TE_ID" property="teId"/>
+		<result column="정산여부" property="calcYN"/>
+		<result column="CLS_TYPE" property="classType"/>
+		<result column="현재날짜" property="cday"/>
+	</resultMap>
+	
+	<!-- 정산 상세 -->
+	<resultMap id="calculateInfoDetail" type="CalculateDTO">
+		<id column="TE_TYPE" property="teType"/>
+		<result column="TE_NAME" property="teName"/>
+		<result column="TE_ID" property="teId"/>
+		<result column="BANK" property="bank"/>
+		<result column="TE_ACNT_NO" property="teAcntNo"/>
+		<result column="TE_ACNT_HOLDER" property="teAcntHolder"/>
+		<result column="CLS_NO" property="classNo"/>
+		<result column="정산여부" property="calcYN"/>
+		<result column="TOTAL_AMOUNT_CHAR" property="totalSalesString"/>
+		<result column="TOTAL_AMOUNT" property="totalSales"/>
+		<result column="USE_FEE_CHAR" property="useFeesString"/>
+		<result column="USE_FEE" property="useFees"/>
+		<result column="CARD_FEE_CHAR" property="cardFeesString"/>
+		<result column="CARD_FEE" property="cardFees"/>
+		<result column="TAX" property="tax"/>
+		<result column="CALC_AMOUNT_CHAR" property="calcAmountString"/>	
+		<result column="CALC_AMOUNT" property="calcAmount"/>		
+		<result column="CLS_TYPE" property="classType"/>		
+		<result column="CLS_TITLE" property="className"/>
+		<result column="정산날짜" property="calcMonth"/>
+		<result column="현재날짜" property="today"/>
+		<result column="TE_NO" property="teNo"/>
+		<result column="TUITION_M_NO" property="tuitionMNo"/>
+	</resultMap>
+	
+	<!-- 환불 -->
+	<resultMap id="refundList" type="RefundDTO">
+		<id column="CANCLE_NO" property="cancelNo"/>
+		<result column="CLS_TYPE" property="classType"/>
+		<result column="CLS_TITLE" property="className"/>
+		<result column="USER_ID" property="id"/>
+		<result column="REFUND_APPLY_DATE" property="refundApplyDate"/>
+		<result column="REFUND_STATUS" property="refundStatus"/>
+		<result column="CLS_NO" property="classNo"/>
+	</resultMap>
+	
+	<!-- 환불 상세 -->
+	<resultMap id="refundInfoDetail" type="RefundDTO">
+		<id column="CANCLE_NO" property="cancelNo"/>
+		<result column="CLS_TYPE" property="classType"/>
+		<result column="CLS_TITLE" property="className"/>
+		<result column="USER_ID" property="id"/>
+		<result column="REFUND_APPLY_DATE" property="refundApplyDate"/>
+		<result column="CANCLE_REASON" property="cancelReason"/>
+		<result column="CANCLE_REASON_DETAIL" property="cancelReasonDetail"/>
+		<result column="REFUND_AMOUNT" property="refundAmount"/>
+		<result column="환불금액" property="toCharRefundAmount"/>
+		<result column="REFUND_DATE" property="refundDate"/>
+		<result column="REFUND_HOLDER" property="refundHolder"/>
+		<result column="REFUND_BANK" property="refundBank"/>
+		<result column="REFUND_ACCOUNT" property="refundAccount"/>
+		<result column="PAY_NO" property="payNo"/>
+		<result column="CLS_NO" property="classNo"/>
+		<result column="REFUND_STATUS" property="refundStatus"/>
+	</resultMap>
+	
+	<!-- 환불 승인 insert 할 때 필요한 값 -->
+	<resultMap id="refundTotalAmount" type="RefundDTO">
+		<id column="TOTAL_AMOUNT" property="totalAmount"/>
+	</resultMap>
+	
+	<resultMap id="reportDetailDTO" type="ReportDetailDTO">
+		<id column="REPORT_NO" property="reportNo"/>
+		<result column="REPORT_TITLE" property="reportTitle"/>
+		<result column="USER_ID" property="reportedId1"/>
+		<result column="TE_ID" property="reportedId2"/>
+		<result column="TE_NO" property="teNo"/>
+		<result column="BLOCK_YN" property="blackListYN"/>
+		<result column="USER_NO" property="userNo"/>
+		<result column="USER_NAME" property="reportedNmae1"/>
+		<result column="TE_NAME" property="reportedNmae2"/>
+		<result column="REPORT_DATE" property="reportDate"/>
+		<result column="REPORT_REASON" property="reason"/>
+		<result column="REPORT_PIC" property="imgPath"/>
+		<result column="PROCS_STATUS" property="reportStatus"/>
+		<result column="type" property="type"/>
+	</resultMap>
+	
+	<resultMap id="blackListDTO" type="blackListDTO" >
+			<id column="USER_NO" property="blackNo"/>
+			<result column="TYPE" property="type"/>
+			<result column="USER_ID" property="blackId"/>
+			<result column="USER_NAME" property="blackName"/>
+			<result column="USER_BLOCK_D" property="enrollDate"/>
+			<result column="USER_BLOCK_REASON" property="blackReason"/>
+	</resultMap>
+	
+	<resultMap id="BlockedTeacherDTO" type="blackListDTO" >
+			<id column="TE_NO" property="blackNo"/>
+			<result column="TYPE" property="type"/>
+			<result column="TE_ID" property="blackId"/>
+			<result column="TE_NAME" property="blackName"/>
+			<result column="TE_BLOCK_D" property="enrollDate"/>
+			<result column="TE_BLOCK_REASON" property="blackReason"/>
+	</resultMap>
+	
+	<resultMap id="cheeringCLassDTO" type="CheeringCLassDTO" >
+			<id column="CLS_NO" property="clsNo"/>
+			<result column="DICISION_DATE" property="firstDecision"/>
+			<result column="DATE_APLCT" property="enrollDate"/>
+			<result column="CLS_TITLE" property="title"/>
+			<result column="TE_NAME" property="teName"/>
+			<result column="CATEGORY_NO" property="categoryNo"/>
+			<result column="응원갯수" property="cheeringCnt"/>
+	</resultMap>
+	
+	<resultMap id="adminDTO" type="adminDTO">
+			<id column="ADMIN_NO" property="adminNo"/>
+			<result column="ADMIN_ID" property="AdminId"/>
+			<result column="ADMIN_PWD" property="AdminPwd"/>
+	</resultMap>
+		
+	<select id="selectTotalUsertList" resultMap="totalDTO">
+		SELECT 
+		       T.TE_NO
+		     , T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , T.TE_ENROLL_DATE
+             , T.BLOCK_YN
+		     , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		  FROM TEACHER_INFO T
+		  LEFT JOIN TE_REPORT_HISTORY TH ON (TH.TE_NO = T.TE_NO)
+		  LEFT JOIN REPORT R ON (TH.REPORT_NO = R.REPORT_NO)
+		 GROUP BY T.TE_NO
+		     , T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , T.TE_ENROLL_DATE
+             , T.BLOCK_YN
+		  UNION ALL
+		 SELECT 
+		        U.USER_NO
+		      , U.TYPE
+		      , U.USER_ID
+		      , U.USER_NAME
+		      , U.USER_ENROLL_DATE
+              , U.BLOCK_YN
+		      , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		  FROM USER_INFO U
+		  LEFT JOIN USER_REPORT_HISTORY UH ON (UH.USER_NO = U.USER_NO)
+		  LEFT JOIN REPORT R ON (UH.REPORT_NO = R.REPORT_NO)
+		 WHERE U.USER_NO NOT IN 0  
+		 GROUP BY U.USER_NO
+		      , U.TYPE
+		      , U.USER_ID
+		      , U.USER_NAME
+		      , U.USER_ENROLL_DATE
+              , U.BLOCK_YN
+    </select>
+
+	<select id="selectAllClassList" resultMap="classLsit">
+		SELECT 
+		       C.CLS_NO
+		     , C.CLS_TITLE
+		     , T.TE_NAME
+		     , C.CLS_PRICE
+		     , C.CLS_TYPE
+		     , C.CLS_STATUS
+             , C.CLS_DICSION_STATUS
+		  FROM CLASS C
+		  JOIN TEACHER_INFO T ON (C.TE_NO = T.TE_NO)
+	</select>
+	
+	<select id="selectAllReportList" resultMap="reportList">
+		  SELECT
+		       R.REPORT_NO
+		     , R.REPORT_TITLE
+		     , R.REPORT_TYPE
+		     , T.TE_ID
+		     , R.REPORT_DATE
+		     , R.PROCS_STATUS
+		  FROM REPORT R
+		  JOIN TEACHER_INFO T ON (R.REPORT_FROM_NO = T.TE_NO)
+		 WHERE REPORT_TYPE = '강사'
+		 UNION ALL
+		   SELECT
+		       R.REPORT_NO
+		     , R.REPORT_TITLE
+		     , R.REPORT_TYPE
+		     , T.USER_ID
+		     , R.REPORT_DATE
+		     , R.PROCS_STATUS
+		  FROM REPORT R
+		  JOIN USER_INFO T ON (R.REPORT_FROM_NO = T.USER_NO)
+		 WHERE REPORT_TYPE = '수강생'
+		 ORDER BY REPORT_NO DESC
+    </select>
+	
+	<!-- 전체 문의 -->
+	<select id="selectAllQuestionList" resultMap="questionList">
+        SELECT
+               *
+          FROM(
+        SELECT 
+			   A.Q_NO
+			 , A.MEMBER_TYPE 유형
+			 , C.USER_NAME 이름
+			 , C.USER_ID 아이디
+			 , A.Q_TITLE 제목
+			 , A.Q_DATE 날짜
+			 , A.ANSWER_YN 답변여부
+		  FROM ADMIN_Q A
+		  JOIN USER_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN USER_INFO C ON (B.USER_NO = C.USER_NO)
+         UNION ALL
+        SELECT 
+			   A.Q_NO
+			 , A.MEMBER_TYPE 유형
+			 , C.TE_NAME 이름
+			 , C.TE_ID 아이디
+			 , A.Q_TITLE 제목
+			 , A.Q_DATE 날짜
+			 , A.ANSWER_YN 답변여부
+		  FROM ADMIN_Q A
+		  JOIN TE_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN TEACHER_INFO C ON (B.TE_NO = C.TE_NO)
+        )
+         ORDER BY Q_NO
+	</select>
+	
+	<!-- 강사문의 -->
+	<select id="selectTeacherQuestionList" resultMap="questionList">
+		SELECT 
+			   A.Q_NO
+			 , A.MEMBER_TYPE 유형
+			 , C.TE_NAME 이름
+			 , C.TE_ID 아이디
+			 , A.Q_TITLE 제목
+			 , A.Q_DATE 날짜
+			 , A.ANSWER_YN 답변여부
+		  FROM ADMIN_Q A
+		  JOIN TE_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN TEACHER_INFO C ON (B.TE_NO = C.TE_NO)
+		 ORDER BY A.Q_NO
+	</select>
+	
+	<!-- 수강생문의 -->
+	<select id="selectStudentQuestionList" resultMap="questionList">
+        SELECT 
+			   A.Q_NO
+			 , A.MEMBER_TYPE 유형
+			 , C.USER_NAME 이름
+			 , C.USER_ID 아이디
+			 , A.Q_TITLE 제목
+			 , A.Q_DATE 날짜
+			 , A.ANSWER_YN 답변여부
+		  FROM ADMIN_Q A
+		  JOIN USER_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN USER_INFO C ON (B.USER_NO = C.USER_NO)
+         ORDER BY A.Q_NO
+	</select>
+	
+	<!-- 강사문의상세 -->
+	<select id="selectTeacherQuestionInfoDetail" resultMap="questionInfoDetail" parameterType="_int">
+		SELECT 
+			   A.Q_NO
+			 , C.TE_NO 번호
+			 , A.MEMBER_TYPE
+			 , C.TE_NAME 이름
+			 , C.TE_ID 아이디
+			 , A.Q_TITLE
+			 , A.Q_CONTENT
+             , D.ANSWER_CONTENT
+		  FROM ADMIN_Q A
+		  JOIN TE_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN TEACHER_INFO C ON (B.TE_NO = C.TE_NO)
+          LEFT JOIN ADMIN_Q_ANSWER D ON (A.Q_NO = D.Q_NO)
+		 WHERE A.MEMBER_TYPE = 'TEACHER'
+	       AND A.Q_NO = #{no}
+	</select>
+	
+	<!-- 수강생문의상세 -->
+	<select id="selectStudentQuestionInfoDetail" resultMap="questionInfoDetail" parameterType="_int">
+        SELECT 
+        	   A.Q_NO
+			 , C.USER_NO 번호
+			 , A.MEMBER_TYPE
+			 , C.USER_NAME 이름
+			 , C.USER_ID 아이디
+			 , A.Q_TITLE
+			 , A.Q_CONTENT
+             , D.ANSWER_CONTENT
+		  FROM ADMIN_Q A
+          JOIN USER_TO_ADMIN_Q B ON (A.Q_NO = B.Q_NO)
+		  JOIN USER_INFO C ON (B.USER_NO = C.USER_NO)
+          LEFT JOIN ADMIN_Q_ANSWER D ON (A.Q_NO = D.Q_NO)
+         WHERE A.MEMBER_TYPE = 'USER'
+           AND A.Q_NO = #{no}
+	</select>
+	
+	<!-- 문의답변달기 - insert -->
+	<insert id="insertAnswer" parameterType="QuestionDTO">
+		INSERT
+  		  INTO ADMIN_Q_ANSWER
+  		VALUES
+  		(
+   		  #{questionReContent}
+  		, SYSDATE
+  		, #{questionNo}
+  		)
+	</insert>
+	
+	<!-- 문의답변달기 - update -->
+	<update id="updateAnswer" parameterType="QuestionDTO">
+		UPDATE ADMIN_Q 
+   		   SET ANSWER_YN = 'Y'
+ 		 WHERE Q_NO = #{questionNo}
+	</update>
+	
+	<select id="selectOneStudent" resultMap="studentDTO" parameterType="_int">
+		SELECT 
+		       U.USER_NO
+		     , U.USER_ID
+		     , U.USER_NAME
+		     , U.TYPE
+		     , U.USER_PHONE
+		     , U.USER_BIRTH
+		     , U.USER_ENROLL_DATE
+		     , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		     , U.BLOCK_YN
+		  FROM USER_INFO U
+		  LEFT JOIN USER_REPORT_HISTORY UH ON (UH.USER_NO = U.USER_NO)
+		  LEFT JOIN REPORT R ON (UH.REPORT_NO = R.REPORT_NO)
+		 WHERE U.USER_NO = #{no}
+		 GROUP BY 
+		          U.USER_NO
+		        , U.USER_ID
+		        , U.USER_NAME
+		        , U.TYPE
+		        , U.USER_PHONE
+		        , U.USER_BIRTH
+		        , U.USER_ENROLL_DATE
+		        , U.BLOCK_YN
+	</select>
+	
+	<select id="selectOneTeacher" resultMap="teacherDTO" parameterType="_int">
+		SELECT 
+		       T.TE_NO
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , T.TYPE
+		     , T.TE_PHONE
+             , T.TE_TYPE
+		     , T.TE_ENROLL_DATE
+             , T.TE_INTRO
+             , T.TE_PIC
+		     , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		     , T.BLOCK_YN
+		  FROM TEACHER_INFO T
+		  LEFT JOIN TE_REPORT_HISTORY TH ON (TH.TE_NO = T.TE_NO)
+		  LEFT JOIN REPORT R ON (TH.REPORT_NO = R.REPORT_NO)
+		 WHERE T.TE_NO = #{no}
+		 GROUP BY 
+                   T.TE_NO
+                 , T.TE_ID
+                 , T.TE_NAME
+                 , T.TYPE
+                 , T.TE_PHONE
+                 , T.TE_TYPE
+                 , T.TE_ENROLL_DATE
+                 , T.TE_INTRO
+                 , T.TE_PIC
+        		 , T.BLOCK_YN
+	</select>
+	
+	<select id="selectTeacherList" resultMap="totalDTO" >
+		SELECT 
+		       T.TE_NO
+		     , T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , T.TE_ENROLL_DATE
+		     , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		     , T.BLOCK_YN
+		  FROM TEACHER_INFO T
+		  LEFT JOIN TE_REPORT_HISTORY TH ON (TH.TE_NO = T.TE_NO)
+		  LEFT JOIN REPORT R ON (TH.REPORT_NO = R.REPORT_NO)
+		 GROUP BY T.TE_NO
+		     , T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , T.TE_ENROLL_DATE
+		     , T.BLOCK_YN
+	</select>
+
+	<select id="selectStudentList" resultMap="userDTO" >
+		 SELECT 
+		        U.USER_NO
+		      , U.TYPE
+		      , U.USER_ID
+		      , U.USER_NAME
+		      , U.USER_ENROLL_DATE
+		      , COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		      , U.BLOCK_YN
+		   FROM USER_INFO U
+		  LEFT JOIN USER_REPORT_HISTORY UH ON (UH.USER_NO = U.USER_NO)
+		  LEFT JOIN REPORT R ON (UH.REPORT_NO = R.REPORT_NO)
+		 WHERE U.USER_NO NOT IN 0  
+		 GROUP BY U.USER_NO
+		      , U.TYPE
+		      , U.USER_ID
+		      , U.USER_NAME
+		      , U.USER_ENROLL_DATE
+		      , U.BLOCK_YN
+	</select>      
+
+	<!-- 쿠폰 -->
+	<select id="selectAllCouponList" resultMap="couponList">
+		SELECT 
+			   A.CPN_NO
+			 , B.USER_ID
+			 , A.CPN_NAME
+             , TO_CHAR(A.DIS_AMOUNT, 'FM999,999,999,999') AS DIS_AMOUNT
+			 , A.CPN_ISSUE_DATE
+			 , A.CPN_START
+			 , A.CPN_END
+			 , A.CPN_USE_YN 
+		  FROM COUPON A
+          JOIN USER_INFO B ON (A.USER_NO = B.USER_NO)
+         ORDER BY A.CPN_NO
+	</select>
+	
+	<!-- 쿠폰 상세 -->
+	<select id="selectCouponInfoDetail" resultMap="couponInfoDetail" parameterType="_int">
+	    SELECT 
+			   B.USER_ID
+			 , A.CPN_NAME
+			 , A.CPN_START
+			 , A.CPN_END
+			 , TO_CHAR(A.DIS_AMOUNT, 'FM999,999,999,999') AS DIS_AMOUNT
+             , COUNT(C.USER_NO) 총합
+		  FROM COUPON A
+          JOIN USER_INFO B ON (A.USER_NO = B.USER_NO)
+          LEFT JOIN ALL_USER_COUPON C ON (A.CPN_NO = C.CPN_NO)
+         WHERE A.CPN_NO = #{no} 
+         GROUP BY B.USER_ID, A.CPN_NAME, A.CPN_START, A.CPN_END, A.DIS_AMOUNT
+	</select>
+	
+ 	<!-- 쿠폰 발급 -->
+	<insert id="insertCouponIssue" parameterType="CouponDTO">
+		<selectKey keyProperty="userNo" order="BEFORE" resultType="_int">
+         	SELECT USER_NO
+              FROM USER_INFO
+              <if test="type == 'total'">
+         	 WHERE USER_ID = 'TOTAL'
+         	  </if>
+         	  <if test="type == 'certain'">
+         	 WHERE USER_ID = #{ userId }
+         	  </if>
+		</selectKey>
+		INSERT
+          INTO COUPON
+        VALUES
+        	(
+          	  SEQ_CPN_NO.NEXTVAL
+        	, #{ couponName }
+        	, #{ discount }
+        	, #{ startDate }
+        	, #{ endDate }
+        	, 'N'
+        	, NULL
+        	, #{ userNo }
+        	, SYSDATE
+            )
+	</insert>
+	
+	<!-- 공지 -->
+	<select id="selectAllNoticeList" resultMap="noticeList">
+		SELECT 
+			   NOTICE_NO
+			 , NOTICE_TYPE
+			 , IMPORTANT_YN
+			 , NOTICE_TITLE
+			 , WRITE_DATE
+		  FROM NOTICE
+		 ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<!-- 공지 상세 -->
+	<select id="selectNoticeInfoDetail" resultMap="noticeInfoDetail" parameterType="_int">
+		SELECT
+			   NOTICE_TYPE
+			 , NOTICE_TITLE
+			 , NOTICE_CONTENT
+			 , IMPORTANT_YN
+			 , NOTICE_NO
+		  FROM NOTICE
+         WHERE NOTICE_NO = #{no}
+	</select>
+	
+	<!-- 공지 등록 -->
+	<insert id="insertNoticeWrite" parameterType="NoticeDTO">
+		INSERT
+  		  INTO NOTICE
+  		VALUES
+  		(
+   		  SEQ_NOTICE_NO.NEXTVAL
+        , #{noticeTitle}
+        , #{noticeContent}
+  		, SYSDATE
+  		<if test='noticeType == "A"'>
+        , 'A'
+       	</if>
+       	<if test='noticeType == "T"'>
+        , 'T'
+       	</if>
+       	<if test='noticeType == "C"'>
+        , 'C'
+       	</if>
+       	<if test='importantYN == "Y"'>
+        , 'Y'
+       	</if>
+       	<if test='importantYN == "N"'>
+        , 'N'
+       	</if>
+  		, 1
+  		)
+	</insert>
+	
+	<!-- 공지 수정 등록 -->
+	<update id="updateNoticeReWrite" parameterType="NoticeDTO">
+		UPDATE NOTICE
+           SET 
+               NOTICE_TITLE = #{noticeTitle}
+             , NOTICE_CONTENT = #{noticeContent}
+             , WRITE_DATE = SYSDATE
+             <if test='noticeType == "A"'>
+	         , NOTICE_TYPE = 'A'
+	       	 </if>
+	       	 <if test='noticeType == "T"'>
+	         , NOTICE_TYPE = 'T'
+	       	 </if>
+	       	 <if test='noticeType == "C"'>
+	         , NOTICE_TYPE = 'C'
+	       	 </if>
+	       	 <if test='importantYN == "Y"'>
+	         , IMPORTANT_YN = 'Y'
+	       	 </if>
+	       	 <if test='importantYN == "N"'>
+	         , IMPORTANT_YN = 'N'
+	       	 </if>
+	     WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	
+	<!-- 정산 미완료 -->
+	<select id="selectNoCalculateList" resultMap="calculateList">
+		SELECT 
+			   * 
+		  FROM
+	   		  (SELECT 
+	    	          A.TUITION_M_NO 번호
+			        , C.TE_TYPE
+			        , C.TE_NAME
+			        , C.TE_ID
+			        , A.CALCUL_STATUS 정산여부
+			        , B.CLS_TYPE
+			        , TO_NUMBER(TO_CHAR(SYSDATE,'DD')) AS 현재날짜
+		         FROM TUITION_MANAGEMENT A
+		         JOIN CLASS B ON (A.CLS_NO = B.CLS_NO)
+                 JOIN TEACHER_INFO C ON (B.TE_NO = C.TE_NO)
+                WHERE A.CALCUL_STATUS = 'N'
+                  AND B.CLS_TYPE = #{classType}
+                  AND A.TUITION_M_NO IN (SELECT MAX(TUITION_M_NO)
+                                           FROM TUITION_MANAGEMENT
+                                          GROUP BY CLS_NO)
+             )
+        ORDER BY 번호
+	</select>
+	
+	<!-- 정산 완료 -->
+	<select id="selectYesCalculateList" resultMap="calculateList">
+         SELECT 
+			   A.CALC_NO AS 번호
+			 , B.TE_TYPE
+			 , B.TE_NAME
+			 , B.TE_ID
+			 , 'Y' AS 정산여부
+			 , D.CLS_TYPE
+			 , TO_NUMBER(TO_CHAR(SYSDATE,'DD')) AS 현재날짜
+		  FROM CALCULATE A
+		  JOIN TEACHER_INFO B ON (A.TE_NO = B.TE_NO)
+          LEFT JOIN TUITION_MANAGEMENT C ON (A.TUITION_M_NO = C.TUITION_M_NO)
+          LEFT JOIN CLASS D ON (C.CLS_NO = D.CLS_NO)
+         WHERE D.CLS_TYPE = #{classType}
+         GROUP BY A.CALC_NO, B.TE_TYPE, B.TE_NAME, B.TE_ID, A.CALC_MONTH, 'Y', D.CLS_TYPE
+         ORDER BY A.CALC_NO
+	</select>
+	
+	<!-- 정산 미완료 상세 -->
+	<select id="selectNoCalculateDetail" resultMap="calculateInfoDetail" parameterType="hashmap">
+		SELECT 
+	          C.TE_TYPE
+	        , C.TE_NAME
+	        , C.TE_ID
+            , C.BANK
+            , C.TE_ACNT_NO
+            , C.TE_ACNT_HOLDER
+            , A.CLS_NO
+	        , A.CALCUL_STATUS 정산여부
+	        , TO_CHAR(A.TOTAL_AMOUNT, 'FM999,999,999,999') AS TOTAL_AMOUNT_CHAR
+	        , A.TOTAL_AMOUNT
+            , TO_CHAR(A.TOTAL_AMOUNT * 0.1, 'FM999,999,999,999') AS USE_FEE_CHAR
+            , (A.TOTAL_AMOUNT * 0.1) AS USE_FEE
+            , TO_CHAR(A.TOTAL_AMOUNT * 0.021, 'FM999,999,999,999') AS CARD_FEE_CHAR
+            , (A.TOTAL_AMOUNT * 0.021) AS CARD_FEE
+            , A.TOTAL_AMOUNT * 0 AS TAX
+            , TO_CHAR(A.TOTAL_AMOUNT - (A.TOTAL_AMOUNT * 0.1) - (A.TOTAL_AMOUNT * 0.021), 'FM999,999,999,999') AS CALC_AMOUNT_CHAR
+	        , (A.TOTAL_AMOUNT - (A.TOTAL_AMOUNT * 0.1) - (A.TOTAL_AMOUNT * 0.021)) AS CALC_AMOUNT
+	        , B.CLS_TYPE
+            , B.CLS_TITLE
+            <if test="cday lte 3">
+            , TO_CHAR(SYSDATE, 'YYYY/MM') AS 정산날짜
+            </if>
+            <if test="cday gt 3">
+            , TO_CHAR(ADD_MONTHS(SYSDATE, 1),'YYYY/MM') 정산날짜
+            </if>
+            , TO_CHAR(SYSDATE,'DD') AS 현재날짜
+            , C.TE_NO
+			, A.TUITION_M_NO
+         FROM TUITION_MANAGEMENT A
+         JOIN CLASS B ON (A.CLS_NO = B.CLS_NO)
+         JOIN TEACHER_INFO C ON (B.TE_NO = C.TE_NO)
+        WHERE A.CALCUL_STATUS = 'N'
+          AND B.CLS_TYPE = #{type}
+          AND A.TUITION_M_NO = #{no}
+	</select>
+	
+	<!-- 정산 완료 상세 -->
+	<select id="selectYesCalculateDetail" resultMap="calculateInfoDetail" parameterType="_int">
+         SELECT 
+			   B.TE_TYPE
+			 , B.TE_NAME
+			 , B.TE_ID
+			 , B.BANK
+			 , B.TE_ACNT_NO
+			 , B.TE_ACNT_HOLDER
+			 , C.CLS_NO
+			 , 'Y' AS 정산여부
+			 , TO_CHAR((A.CALC_AMOUNT + A.USE_FEE + A.CARD_FEE + A.TAX), 'FM999,999,999,999') AS TOTAL_AMOUNT_CHAR
+			 , (A.CALC_AMOUNT + A.USE_FEE + A.CARD_FEE + A.TAX) AS TOTAL_AMOUNT
+             , TO_CHAR(A.USE_FEE, 'FM999,999,999,999') AS USE_FEE_CHAR
+             , A.USE_FEE
+             , TO_CHAR(A.CARD_FEE, 'FM999,999,999,999') AS CARD_FEE_CHAR
+             , A.CARD_FEE
+             , A.TAX
+			 , TO_CHAR(A.CALC_AMOUNT, 'FM999,999,999,999') AS CALC_AMOUNT_CHAR
+			 , A.CALC_AMOUNT
+             , D.CLS_TYPE
+             , D.CLS_TITLE
+             , A.CALC_MONTH AS 정산날짜
+             , TO_CHAR(SYSDATE,'DD') AS 현재날짜
+             , B.TE_NO
+			 , C.TUITION_M_NO
+		  FROM CALCULATE A
+		  JOIN TEACHER_INFO B ON (A.TE_NO = B.TE_NO)
+          JOIN TUITION_MANAGEMENT C ON (A.TUITION_M_NO = C.TUITION_M_NO)
+          JOIN CLASS D ON (C.CLS_NO = D.CLS_NO)
+          JOIN PAYMENT E ON (C.PAY_NO = E.PAY_NO)
+          JOIN CLASS_APPLY F ON (E.CLS_APL_NO = F.CLS_APL_NO)
+         WHERE A.CALC_NO = #{no}
+	</select>
+	
+	<!-- 정산 승인 - insert -->
+	<insert id="insertCalculate" parameterType="CalculateDTO">
+		INSERT 
+  		  INTO CALCULATE
+		VALUES
+		(
+		  SEQ_CALC_NO.NEXTVAL
+		, SUBSTR(TO_CHAR(SYSDATE),-8,5)
+		, #{ calcAmount }
+		, #{ useFees }
+		, #{ tax }
+		, #{ cardFees }
+		, #{ teNo }
+		, #{ tuitionMNo }
+		)
+	</insert>
+	
+	<!-- 정산 승인 - update -->
+	<update id="updateCalculate" parameterType="CalculateDTO">
+		UPDATE TUITION_MANAGEMENT
+           SET 
+               CALCUL_STATUS = 'Y'
+         WHERE CLS_NO = #{ classNo }
+	</update>
+	
+	<!-- 환불 리스트 -->
+	<select id="selectRefundList" resultMap="refundList">
+		SELECT
+       		   A.CANCLE_NO
+     		 , F.CLS_TYPE
+     		 , F.CLS_TITLE
+     		 , D.USER_ID
+     		 , A.REFUND_APPLY_DATE
+     		 , A.REFUND_STATUS
+     		 , F.CLS_NO
+  		  FROM PAYMENT_CANCEL A
+  		  JOIN PAYMENT B ON (A.PAY_NO = B.PAY_NO)
+  		  JOIN CLASS_APPLY C ON (B.CLS_APL_NO = C.CLS_APL_NO)
+  		  JOIN USER_INFO D ON (C.USER_NO = D.USER_NO)
+  		  JOIN SCHEDULE E ON (C.SCHEDULE_NO = E.SCHEDULE_NO)
+  		  JOIN CLASS F ON (E.CLS_NO = F.CLS_NO)
+  		 WHERE A.REFUND_STATUS = #{type}
+		 ORDER BY A.CANCLE_NO
+	</select>
+	
+	<!-- 환불 상세 -->
+	<select id="selectRefundInfoDetail" resultMap="refundInfoDetail" parameterType="hashmap">
+		 SELECT
+			   A.CANCLE_NO
+     		 , F.CLS_TYPE
+     		 , F.CLS_TITLE
+     		 , D.USER_ID
+     		 , A.REFUND_APPLY_DATE
+             , A.CANCLE_REASON
+             , A.CANCLE_REASON_DETAIL
+             , A.REFUND_AMOUNT
+             , TO_CHAR(A.REFUND_AMOUNT, 'FM999,999,999,999') AS 환불금액
+             , A.REFUND_DATE
+             , A.REFUND_HOLDER
+             , A.REFUND_BANK
+             , A.REFUND_ACCOUNT
+             , B.PAY_NO
+             , F.CLS_NO
+             , A.REFUND_STATUS
+  		  FROM PAYMENT_CANCEL A
+  		  JOIN PAYMENT B ON (A.PAY_NO = B.PAY_NO)
+  		  JOIN CLASS_APPLY C ON (B.CLS_APL_NO = C.CLS_APL_NO)
+  		  JOIN USER_INFO D ON (C.USER_NO = D.USER_NO)
+  		  JOIN SCHEDULE E ON (C.SCHEDULE_NO = E.SCHEDULE_NO)
+  		  JOIN CLASS F ON (E.CLS_NO = F.CLS_NO)
+  		 WHERE A.REFUND_STATUS = #{ status }
+           AND A.CANCLE_NO = #{ no }
+	</select>
+	
+	<!-- 환불 승인 후 TUITION_MANAGEMENT 테이블에 insert 하기위해서 -->
+	<select id="selectRefundTotalAmount" resultMap="refundTotalAmount" parameterType="hashmap">
+		SELECT 
+		       TOTAL_AMOUNT
+  		  FROM TUITION_MANAGEMENT
+ 		 WHERE CLS_NO = #{ classNo }
+           AND TUITION_M_NO = (SELECT MAX(TUITION_M_NO) FROM TUITION_MANAGEMENT WHERE CLS_NO = #{ classNo })
+	</select>
+	
+	<!-- 환불 승인 - update -->
+	<update id="updateRefundApprove" parameterType="RefundDTO">
+		UPDATE PAYMENT_CANCEL
+           SET 
+               REFUND_DATE = SYSDATE
+             , REFUND_STATUS = 'Y'
+         WHERE CANCLE_NO = #{ refund.cancelNo }
+	</update>
+	
+	<!-- 환불 승인 - insert -->
+	<insert id="insertRefundApprove" parameterType="RefundDTO">
+		 INSERT
+   		   INTO TUITION_MANAGEMENT
+ 		 VALUES
+ 		(
+ 		  SEQ_TUITION_M_NO.NEXTVAL
+ 		, #{ finalPrice }
+ 		, #{ refund.classNo }
+ 		, #{ refund.payNo }
+ 		, 'N'
+ 		)
+	</insert>
+	
+	<select id="selectStudentReportList" resultMap="reportDetailDTO" parameterType="ReportDetailDTO">
+		SELECT
+	       REPORT_NO
+	     , REPORT_TITLE
+	     <if test='type == "U"'>
+	     , TE_ID
+	     , TE_NAME
+	     , TE_NO
+	     </if>
+	     <if test='type == "T"'>
+	     , USER_ID
+	     , USER_NAME
+	     , USER_NO
+	     </if>
+	     , BLOCK_YN
+	     , TYPE
+	     , REPORT_DATE
+	     , REPORT_REASON
+	     , REPORT_PIC
+	     , PROCS_STATUS
+	  FROM REPORT R 
+	  <if test='type == "T"'>
+	  JOIN USER_INFO U ON (R.REPORT_TO_NO = U.USER_NO)
+	 WHERE REPORT_TYPE = '강사'
+	 </if>
+	  <if test='type == "U"'>
+	  JOIN TEACHER_INFO U ON (R.REPORT_TO_NO = U.TE_NO)
+	 WHERE REPORT_TYPE = '수강생'
+	 </if>
+	   AND REPORT_NO = #{reportNo}
+	</select>
+		
+	<update id="updateReportStatus" parameterType="_int">
+		UPDATE REPORT 
+		   SET PROCS_STATUS = 'Y'
+		 WHERE REPORT_NO = #{no}
+	</update>
+	
+	<update id="updateReportStatus2" parameterType="_int">
+		UPDATE REPORT 
+		   SET PROCS_STATUS = 'S'
+		 WHERE REPORT_NO = #{no}
+	</update>
+	
+	<select id="selectAllBlackList" resultMap="blackListDTO">
+		SELECT
+		       U.TYPE
+		     , U.USER_ID
+		     , U.USER_NAME
+		     , UB.USER_BLOCK_D
+             , UB.USER_BLOCK_REASON
+		  FROM USER_BLOCK_LIST UB
+		  JOIN USER_INFO U ON (UB.USER_NO = U.USER_NO)
+		 UNION ALL
+		SELECT 
+		       T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , TB.TE_BLOCK_D
+             , TB.TE_BLOCK_REASON
+		  FROM TE_BLOCK_LIST TB
+		  JOIN TEACHER_INFO T ON (TB.TE_NO = T.TE_NO)
+	</select>
+	
+	<select id="selectBlockedTeacherList" resultMap="BlockedTeacherDTO">
+		SELECT 
+		       T.TYPE
+		     , T.TE_ID
+		     , T.TE_NAME
+		     , TB.TE_BLOCK_D
+		     , TB.TE_BLOCK_REASON
+		  FROM TE_BLOCK_LIST TB
+		  JOIN TEACHER_INFO T ON (TB.TE_NO = T.TE_NO)
+	</select>
+	
+	<select id="selectBlockedStudentList" resultMap="blackListDTO">
+		SELECT
+		       U.TYPE
+		     , U.USER_ID
+		     , U.USER_NAME
+		     , UB.USER_BLOCK_D
+		  FROM USER_BLOCK_LIST UB
+		  JOIN USER_INFO U ON (UB.USER_NO = U.USER_NO)
+	</select>
+	
+	<select id="selectReportCnt"  resultType="_int" parameterType="hashmap">
+		<if test='type == "T"'>
+		SELECT 
+               COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		  FROM TEACHER_INFO T
+		  LEFT JOIN TE_REPORT_HISTORY TH ON (TH.TE_NO = T.TE_NO)
+		  LEFT JOIN REPORT R ON (TH.REPORT_NO = R.REPORT_NO)
+         WHERE T.TE_NO = #{userNo}
+        </if>
+        <if test='type == "U"'>
+		SELECT 
+               COUNT(DECODE(R.PROCS_STATUS,'Y',1)) 누적신고
+		  FROM USER_INFO U
+		  LEFT JOIN USER_REPORT_HISTORY UH ON (UH.USER_NO = U.USER_NO)
+		  LEFT JOIN REPORT R ON (UH.REPORT_NO = R.REPORT_NO)
+         WHERE U.USER_NO = #{userNo}
+        </if>
+	</select>
+	
+	<insert id="insertBlackList" parameterType="hashmap">
+		INSERT 
+	     <if test=' blackMap.type =="T"'>
+		  INTO TE_BLOCK_LIST
+		  </if>
+	     <if test='blackMap.type =="U"'>
+		  INTO USER_BLOCK_LIST
+		  </if>
+		VALUES
+		(
+		  SEQ_USER_BLOCK_NO.NEXTVAL
+		, #{blackMap.userNo}
+		, #{blackMap.blackReason}
+		, SYSDATE
+		)
+	</insert>
+	
+	<insert id="insertBlackListByThreeCnt" parameterType="hashmap">
+		INSERT 
+	     <if test='type == "T"'>
+		  INTO TE_BLOCK_LIST
+		  </if>
+	     <if test='type == "U"'>
+		  INTO USER_BLOCK_LIST
+		  </if>
+		VALUES
+		(
+	     <if test='type == "T"'>
+		  SEQ_TE_BLOCK_NO.NEXTVAL
+		, #{userNo}
+		, '누적 신고 3회로 블랙리스트 추가'
+		  </if>
+	     <if test='type == "U"'>
+		  SEQ_USER_BLOCK_NO.NEXTVAL
+		, #{userNo}
+		, '누적 신고 3회로 블랙리스트 추가'
+		  </if>
+		, SYSDATE
+		)
+	</insert>
+	
+	<update id="updateBlackListOnUSerTable" parameterType="hashmap">
+	    <if test='blackMap.type == "T"'>
+		UPDATE TEACHER_INFO
+		   SET BLOCK_YN = 'Y'
+		</if>
+		<if test='blackMap.type == "T"'>
+		 WHERE TE_NO = #{blackMap.userNo}
+		</if>
+	    <if test='blackMap.type == "U"'>
+		UPDATE USER_INFO
+		   SET BLOCK_YN = 'Y'
+		</if>
+		<if test='blackMap.type == "U"'>
+		 WHERE USER_NO = #{blackMap.userNo}
+		</if>
+	</update>
+	
+	<update id="updateBlackListOnUSerTableByCnt" parameterType="hashmap">
+	    <if test='type == "T"'>
+		UPDATE TEACHER_INFO
+		   SET BLOCK_YN = 'Y'
+		</if>
+		<if test='type == "T"'>
+		 WHERE TE_NO = #{userNo}
+		</if> 
+	    <if test='type == "U"'>
+		UPDATE USER_INFO
+		   SET BLOCK_YN = 'Y'
+		</if>
+		<if test='type == "U"'>		  
+		 WHERE USER_NO = #{userNo} 
+		</if>
+	</update>
+	
+	<select id="selectClassBycategory" resultMap="classLsit" parameterType="hashmap">
+		SELECT 
+		       C.CLS_NO
+		     , C.CLS_TITLE
+		     , T.TE_NAME
+		     , C.CLS_PRICE
+		     , C.CLS_TYPE
+		     , C.CLS_STATUS
+		     , C.CLS_DICSION_STATUS
+		  FROM CLASS C
+		  JOIN TEACHER_INFO T ON (C.TE_NO = T.TE_NO)
+		  <if test='type == "one"'>
+		 WHERE CLS_DICSION_STATUS = 'W'
+		  </if>
+		  <if test='type == "two"'>
+		 WHERE CLS_DICSION_STATUS = 'F'
+		  </if>
+		  <if test='type == "accept"'>
+		 WHERE CLS_DICSION_STATUS = 'S'
+		   AND CLS_STATUS NOT IN 'E'
+		  </if>
+		  <if test='type == "reject"'>
+		 WHERE CLS_DICSION_STATUS = 'R'
+		  </if>
+		  <if test='type == "lackOfCheering"'>
+		 WHERE CLS_DICSION_STATUS = 'L'
+		  </if>
+		  <if test='type == "complate"'>
+		 WHERE CLS_STATUS = 'E'
+		  </if>
+	</select>
+	
+	<update id="updateFirstDecision" parameterType="ClsDecisionDTO">
+		UPDATE CLASS
+		<if test='status == "accept"'>
+		   SET CLS_DICSION_STATUS = 'F'
+	    </if>
+	    <if test='status ==  "reject"'>
+		   SET CLS_DICSION_STATUS = 'R'
+	    </if>
+	     WHERE CLS_NO = #{clsNo}
+	</update>
+	
+	<insert id="insertClassDecision" parameterType="ClsDecisionDTO">
+		INSERT
+		  INTO DISICION_HISTORY
+	    VALUES
+	    (
+	      SEQ_DICSION_NO.NEXTVAL
+	     <if test='status == "accept"'>
+	    , null
+	    </if>
+	    <if test='status ==  "reject"'>
+	    , #{rejectReason}
+	    </if>
+	    , SYSDATE
+	    , 1
+	    , #{clsNo}
+	    , null 
+	    )
+	 </insert>
+	 
+	 <select id="selectCheeringClass" resultMap="cheeringCLassDTO">
+		SELECT 
+		       C.CLS_NO
+		     , DH.DICISION_DATE
+		     , C.DATE_APLCT
+		     , C.CLS_TITLE
+		     , T.TE_NAME
+		     , C.CATEGORY_NO
+		     , COUNT(DECODE(CHEERING_STATUS,'Y',1)) 응원갯수
+		  FROM CLASS C
+		  LEFT JOIN TEACHER_INFO T on (C.TE_NO = T.TE_NO)
+		  LEFT JOIN DISICION_HiSTORY DH on (DH.CLS_NO = C.CLS_NO)
+		  LEFT JOIN CHEERING_HiSTORY CH on (C.CLS_NO = CH.CLS_NO)
+		 WHERE C.CLS_DICSION_STATUS = 'F'
+		 GROUP BY C.CLS_NO
+		        , DH.DICISION_DATE
+		        , C.DATE_APLCT
+		        , C.CLS_TITLE
+		        , T.TE_NAME
+		        , C.CATEGORY_NO
+	 </select>
+	 
+	 <select id="selectUserNoByCheeringClass" parameterType="_int" resultType="integer">
+	 	SELECT 
+		       CH.USER_NO
+		  FROM CHEERING_HISTORY CH
+		 WHERE CH.CLS_NO = #{clsNo}
+	 </select>
+	 
+	 <update id="updateClsSecondDecision" parameterType="_int">
+	 	UPDATE CLASS
+	 	   SET CLS_DICSION_STATUS = 'S'
+	 	 WHERE CLS_NO = #{clsNo}
+	 </update>
+	 
+	 <update id="updateClsSecondDecisionHistory" parameterType="_int">
+	 	UPDATE DISICION_HISTORY 
+	 	   SET SECOND_DICSION_DATE = SYSDATE
+	 	 WHERE CLS_NO = #{clsNo}
+	 </update>
+	 
+	 <insert id="insertCheeringCoupon" parameterType="UserClassDTO">
+		INSERT
+		  INTO COUPON
+		VALUES
+		(
+		  SEQ_CPN_NO.NEXTVAL
+		, '응원강의 개설 축하 쿠폰'
+		, #{price}
+		, SYSDATE
+		, #{endDate}
+		, 'N'
+		, #{clsNo}
+		, #{userNo}
+		, SYSDATE
+		)
+	 </insert>
+	 
+	 <update id="updateClsSecondDecisionReject" parameterType="_int">
+	 	UPDATE CLASS
+	 	   SET CLS_DICSION_STATUS = 'L'
+	 	 WHERE CLS_NO = #{clsNo}	 
+	 </update>
+	 
+	 <update id="updateClsSecondDecisionHistoryRedject" parameterType="_int">
+	 	UPDATE DISICION_HISTORY 
+	 	   SET SECOND_DICSION_DATE = SYSDATE,
+	 	       REJECT_REASON = '응원수 부족'
+	 	 WHERE CLS_NO = #{clsNo}	 
+	 </update>
+	 
+	 <select id="selectRejectReason" resultType="string" parameterType="_int">
+	 SELECT 
+	       REJECT_REASON
+	  FROM DISICION_HISTORY
+	 WHERE CLS_NO = #{clsNo}
+	 </select>
+	 <select id="selectAdminInfo" resultMap="adminDTO" parameterType="adminDTO">
+		 SELECT
+		       *
+		  FROM ADMIN_INFO
+		 WHERE ADMIN_ID = #{AdminId}
+	 </select>
+</mapper>

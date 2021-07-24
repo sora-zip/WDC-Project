@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tig.wdc.user.model.dao.UserCategoryMapper">
+
+    <resultMap type="UserClassDTO" id="UserCategoryResult">
+        <id column="CLS_NO" property="clsNo"/>
+        <result column="CLS_TITLE" property="title"/>
+        <result column="CLS_ADDRESS" property="address"/>
+        <result column="CLS_INTRO" property="intro"/>
+        <result column="CLS_C_EXPL" property="cExpl"/>
+        <result column="CLS_TIME" property="time"/>
+        <result column="CLS_START_D" property="startDate"/>
+        <result column="CLS_END_D" property="endDate"/>
+        <result column="CLS_PRICE" property="price"/>
+        <result column="CLS_ADD_INFO" property="addInfo"/>
+        <result column="CLS_ADD_SUP" property="addSup"/>
+        <result column="CLS_DICSION_STATUS" property="dicsionStatus"/>
+        <result column="CLS_TYPE" property="clsType"/>
+        <result column="DATE_APLCT" property="dateAplct"/>
+        <result column="CLS_STATUS" property="status"/>
+        <result column="TE_NO" property="teNo"/>
+        <result column="CATEGORY_NO" property="categoryNo"/>
+        <result column="CLS_SIMPLE_INTRO" property="simpleIntro"/>
+        <result column="SAVE_PATH" property="titlePic"/>
+        <result column="D_DAY" property="dDay"/>
+        <result column="LIKE_STATUS" property="likeStatus"/>
+    </resultMap>
+
+	<select id="selectClassCategory" resultMap="UserCategoryResult" parameterType="UserClassDTO">
+       SELECT
+              NVL((SELECT LH.LIKE_STATUS FROM LIKE_HISTORY LH WHERE LH.USER_NO = #{ userNo } AND LH.CLS_NO = A.CLS_NO),'N') AS LIKE_STATUS
+            , A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+         <if test="searchCheckBox == null">
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          <![CDATA[
+          AND A.CLS_END_D > SYSDATE
+          ]]>
+         </if>
+         <if test="searchCheckBox == 'proceeding' and searchCheckBox != null">
+        WHERE A.CLS_DICSION_STATUS = 'S'
+          <![CDATA[
+          AND A.CLS_END_D > SYSDATE
+          ]]>
+         </if>
+         <if test="searchCheckBox == 'scheduledToOpen' and searchCheckBox != null">
+        WHERE A.CLS_DICSION_STATUS = 'F'
+          <![CDATA[
+          AND A.CLS_END_D > SYSDATE
+          ]]>
+         </if>
+         <if test="searchCheckBox == 'endClass' and searchCheckBox != null">
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          <![CDATA[
+          AND A.CLS_END_D < SYSDATE
+          ]]>
+         </if>
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+          AND T.TYPE = 'TITLE'
+         <if test="searchContent != null">
+          AND A.CLS_TITLE LIKE '%${ searchContent }%'
+         </if> 
+         <if test="minPrice != 0 and  maxPrice != 0">
+         <![CDATA[
+          AND A.CLS_PRICE >= #{ minPrice }
+          AND A.CLS_PRICE <= #{ maxPrice }
+          ]]>
+         </if> 
+    </select>
+    
+    <select id="selectSportsClassCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 1
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+    </select>
+
+    <select id="selectClassBeautyCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 4
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+    </select>
+    
+    <select id="selectClassArtCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 3
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+    </select>
+    
+    <select id="selectClassCookCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 2
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+          
+    </select>
+    
+    <select id="selectClassComputerCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 5
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+          
+    </select>
+    
+    <select id="selectClassLanguageCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 6
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+    </select>
+    
+        <select id="selectClassRevenuCategory" resultMap="UserCategoryResult">
+       SELECT
+              A.*
+            , T.* 
+            , DH.*
+            , SUBSTR((ROUND(DICISION_DATE + INTERVAL '7' DAY)- SYSDATE),0,1) D_DAY
+         FROM CLASS A
+         JOIN ATTACHMENT T ON(A.CLS_NO = T.CLS_NO)
+         LEFT JOIN DISICION_HISTORY DH ON (DH.CLS_NO = A.CLS_NO)
+        WHERE (A.CLS_DICSION_STATUS = 'S'
+           OR  A.CLS_DICSION_STATUS = 'F')
+          AND DH.DICISION_DATE IS NOT NULL
+          AND A.CLS_DICSION_STATUS != 'L'
+          AND A.CLS_DICSION_STATUS != 'R'
+		  AND A.CATEGORY_NO = 7
+          AND T.TYPE = 'TITLE'
+          AND A.CLS_END_D > SYSDATE
+    </select>
+</mapper>
